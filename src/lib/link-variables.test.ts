@@ -32,9 +32,21 @@ test('keeps missing variables literal and safely encodes defined values', () => 
   ).toBe(`https://example.com/?token=a%26b%20c&missing=${variable('other')}`);
 });
 
-test('only accepts destination variables after the URL authority', () => {
+test('uses an initial variable as the complete destination URL', () => {
+  expect(
+    resolveLinkVariables(`$${'{destination}'}?text=${variable('message')}`, {
+      destination: 'https://wa.me/51919080741',
+      message: 'Hola & gracias',
+    }),
+  ).toBe('https://wa.me/51919080741?text=Hola%20%26%20gracias');
+});
+
+test('accepts a complete URL variable followed by any destination suffix', () => {
   expect(isValidLinkDestinationUrl(`https://example.com/path?token=${variable('token')}`)).toBe(
     true,
   );
   expect(isValidLinkDestinationUrl(`https://${variable('domain')}/path`)).toBe(false);
+  expect(isValidLinkDestinationUrl(`${variable('destination')}?text=hello`)).toBe(true);
+  expect(isValidLinkDestinationUrl(`${variable('destination')}&text=hello`)).toBe(true);
+  expect(isValidLinkDestinationUrl(`${variable('destination')}@example.com`)).toBe(true);
 });

@@ -2,6 +2,7 @@ import { isValidLinkUrl } from './link-domains';
 
 export const LINK_VARIABLE_REGEX = /\$\{([a-z][a-z0-9_]*)\}/gi;
 export const LINK_VARIABLE_NAME_REGEX = /^[a-z][a-z0-9_]{0,63}$/;
+const INITIAL_VARIABLE_REGEX = /^\$\{([a-z][a-z0-9_]*)\}/i;
 
 export function normalizeLinkVariableName(value?: string | null) {
   const name = value?.trim().toLowerCase();
@@ -16,6 +17,14 @@ export function getLinkVariableNames(url: string) {
 }
 
 export function isValidLinkDestinationUrl(value: string) {
+  const initialVariable = value.match(INITIAL_VARIABLE_REGEX);
+
+  if (initialVariable) {
+    // The variable supplies the complete URL. Keep the rest of the template untouched so
+    // administrators can compose it with their own query-string conventions.
+    return true;
+  }
+
   if (!isValidLinkUrl(value)) {
     return false;
   }
@@ -30,9 +39,23 @@ export function isValidLinkDestinationUrl(value: string) {
 }
 
 export function resolveLinkVariables(url: string, variables: Record<string, string>) {
-  return url.replace(LINK_VARIABLE_REGEX, (match, name) => {
+  const initialVariable = url.match(INITIAL_VARIABLE_REGEX);
+
+  if (initialVariable) {
+    const value = variables[initialVariable[1].toLowerCase()];
+
+    if (value !== undefined) {
+      return `${value}${url
+        .slice(initialVariable[0].length)
+        .replace(LINK_VARIABLE_REGEX, replaceLinkVariable)}`;
+    }
+  }
+
+  return url.replace(LINK_VARIABLE_REGEX, replaceLinkVariable);
+
+  function replaceLinkVariable(match: string, name: string) {
     const value = variables[name.toLowerCase()];
 
     return value === undefined ? match : encodeURIComponent(value);
-  });
+  }
 }

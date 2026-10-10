@@ -6,6 +6,7 @@ import {
   findLinkByDefaultDomain,
   findLinkByDomain,
   findShortDomainByHostname,
+  getLinkVariablesByNames,
 } from '@/queries/prisma';
 import { GET } from './route';
 
@@ -28,11 +29,13 @@ vi.mock('@/queries/prisma', () => ({
   findLinkByDefaultDomain: vi.fn(),
   findLinkByDomain: vi.fn(),
   findShortDomainByHostname: vi.fn(),
+  getLinkVariablesByNames: vi.fn(),
 }));
 
 const findLinkByDefaultDomainMock = vi.mocked(findLinkByDefaultDomain);
 const findLinkByDomainMock = vi.mocked(findLinkByDomain);
 const findShortDomainByHostnameMock = vi.mocked(findShortDomainByHostname);
+const getLinkVariablesByNamesMock = vi.mocked(getLinkVariablesByNames);
 const postMock = vi.mocked(POST);
 const getLinkDomainVerificationHostnameMock = vi.mocked(getLinkDomainVerificationHostname);
 
@@ -41,11 +44,14 @@ const verificationParams = { params: Promise.resolve({ slug: '_umami-domain-veri
 const request = (hostname = 'app.example.com') =>
   new Request(`https://${hostname}/q/abcdefgh`, { headers: { host: hostname } });
 const link = { id: 'link-1', url: 'https://destination.example.com' } as any;
+const variable = (name: string) => `\${${name}}`;
 
 beforeEach(() => {
   findLinkByDefaultDomainMock.mockReset();
   findLinkByDomainMock.mockReset();
   findShortDomainByHostnameMock.mockReset();
+  getLinkVariablesByNamesMock.mockReset();
+  getLinkVariablesByNamesMock.mockResolvedValue([]);
   postMock.mockReset();
   getLinkDomainVerificationHostnameMock.mockReset();
   redis.enabled = false;
@@ -63,6 +69,34 @@ test('redirects a link from an assigned custom domain', async () => {
   expect(findLinkByDomainMock).toHaveBeenCalledWith('abcdefgh', 'domain-1');
   expect(findLinkByDefaultDomainMock).not.toHaveBeenCalled();
   expect(response.headers.get('location')).toBe('https://destination.example.com/');
+});
+
+test('resolves destination variables on each redirect', async () => {
+  findShortDomainByHostnameMock.mockResolvedValue(null);
+  findLinkByDefaultDomainMock.mockResolvedValue({
+    ...link,
+    url: `https://destination.example.com/?token=${variable('TOKEN')}`,
+  });
+  getLinkVariablesByNamesMock.mockResolvedValue([{ name: 'token', value: 'a&b c' }] as any);
+
+  const response = await GET(request(), params);
+
+  expect(getLinkVariablesByNamesMock).toHaveBeenCalledWith(['token']);
+  expect(response.headers.get('location')).toBe('https://destination.example.com/?token=a%26b%20c');
+});
+
+test('keeps undefined destination variables literal', async () => {
+  findShortDomainByHostnameMock.mockResolvedValue(null);
+  findLinkByDefaultDomainMock.mockResolvedValue({
+    ...link,
+    url: `https://destination.example.com/?token=${variable('missing')}`,
+  });
+
+  const response = await GET(request(), params);
+
+  expect(response.headers.get('location')).toBe(
+    `https://destination.example.com/?token=${variable('missing')}`,
+  );
 });
 
 test('returns the signed domain verification document before the domain is registered', async () => {

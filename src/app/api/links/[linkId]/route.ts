@@ -1,5 +1,6 @@
 import { z } from 'zod';
-import { isValidLinkSlug, isValidLinkUrl, normalizeAssignedLinkDomains } from '@/lib/link-domains';
+import { isValidLinkSlug, normalizeAssignedLinkDomains } from '@/lib/link-domains';
+import { isValidLinkDestinationUrl } from '@/lib/link-variables';
 import { parseRequest } from '@/lib/request';
 import { badRequest, json, ok, serverError, unauthorized } from '@/lib/response';
 import { canDeleteLink, canUpdateLink, canViewLink } from '@/permissions';
@@ -26,7 +27,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ link
 export async function POST(request: Request, { params }: { params: Promise<{ linkId: string }> }) {
   const schema = z.object({
     name: z.string().max(100).optional(),
-    url: z.string().max(500).refine(isValidLinkUrl).optional(),
+    url: z.string().max(500).refine(isValidLinkDestinationUrl).optional(),
     slug: z.string().refine(isValidLinkSlug).optional(),
     isDefaultDomainEnabled: z.boolean().optional(),
     domains: z.array(z.string()).max(20).optional(),

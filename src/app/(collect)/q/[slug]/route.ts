@@ -4,12 +4,18 @@ import { NextResponse } from 'next/server';
 import { POST } from '@/app/api/send/route';
 import { getLinkDomainVerificationHostname } from '@/lib/link-domain-verification';
 import { getLinkCacheKey, getRequestLinkDomain } from '@/lib/link-domains';
+import {
+  getLinkVariableNames,
+  isValidLinkDestinationUrl,
+  resolveLinkVariables,
+} from '@/lib/link-variables';
 import redis from '@/lib/redis';
 import { notFound } from '@/lib/response';
 import {
   findLinkByDefaultDomain,
   findLinkByDomain,
   findShortDomainByHostname,
+  getLinkVariablesByNames,
 } from '@/queries/prisma';
 
 export async function GET(request: Request, { params }: { params: Promise<{ slug: string }> }) {
@@ -66,5 +72,11 @@ export async function GET(request: Request, { params }: { params: Promise<{ slug
 
   await POST(req);
 
-  return NextResponse.redirect(link.url);
+  const variables = await getLinkVariablesByNames(getLinkVariableNames(link.url));
+  const destination = resolveLinkVariables(
+    link.url,
+    Object.fromEntries(variables.map(variable => [variable.name, variable.value])),
+  );
+
+  return isValidLinkDestinationUrl(destination) ? NextResponse.redirect(destination) : notFound();
 }

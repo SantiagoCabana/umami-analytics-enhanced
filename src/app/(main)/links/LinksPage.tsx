@@ -7,6 +7,7 @@ import { Panel } from '@/components/common/Panel';
 import { useLoginQuery, useMessages, useNavigation, useTeamMembersQuery } from '@/components/hooks';
 import { ROLES } from '@/lib/constants';
 import { LinkAddButton } from './LinkAddButton';
+import { LinkVariablesButton } from './LinkVariablesButton';
 
 export function LinksPage() {
   const { user } = useLoginQuery();
@@ -25,6 +26,7 @@ export function LinksPage() {
       <Column gap="6" margin="2">
         <PageHeader title={t(labels.links)}>
           <Row alignItems="center" gap="3">
+            {user.isAdmin && <LinkVariablesButton />}
             {showActions && <LinkAddButton teamId={teamId} />}
           </Row>
         </PageHeader>

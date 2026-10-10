@@ -373,6 +373,16 @@ model LinkDomain {
   @@map("link_domain")
 }
 
+model LinkVariable {
+  id        String    @id() @map("link_variable_id") @db.Uuid
+  name      String    @unique() @db.VarChar(64)
+  value     String    @db.VarChar(2000)
+  createdAt DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime? @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@map("link_variable")
+}
+
 model ShortDomain {
   id              String    @id() @map("short_domain_id") @db.Uuid
   hostname        String    @unique() @db.VarChar(255)

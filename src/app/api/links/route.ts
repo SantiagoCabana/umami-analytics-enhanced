@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { uuid } from '@/lib/crypto';
-import { isValidLinkSlug, isValidLinkUrl, normalizeAssignedLinkDomains } from '@/lib/link-domains';
+import { isValidLinkSlug, normalizeAssignedLinkDomains } from '@/lib/link-domains';
+import { isValidLinkDestinationUrl } from '@/lib/link-variables';
 import { getQueryFilters, parseRequest } from '@/lib/request';
 import { badRequest, json, serverError, unauthorized } from '@/lib/response';
 import { pagingParams, searchParams, sortingParams } from '@/lib/schema';
@@ -30,7 +31,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   const schema = z.object({
     name: z.string().max(100),
-    url: z.string().max(500).refine(isValidLinkUrl),
+    url: z.string().max(500).refine(isValidLinkDestinationUrl),
     slug: z.string().refine(isValidLinkSlug),
     isDefaultDomainEnabled: z.boolean().optional(),
     domains: z.array(z.string()).max(20).optional(),

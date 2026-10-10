@@ -7,7 +7,7 @@ export function AdminWebsitesDataTable() {
 
   return (
     <DataGrid query={query} allowSearch={true}>
-      {props => <AdminWebsitesTable {...props} />}
+      {({ data }) => <AdminWebsitesTable data={data} />}
     </DataGrid>
   );
 }

@@ -30,6 +30,7 @@ export * from './queries/useJourneyQuery';
 export * from './queries/useLinkQuery';
 export * from './queries/useLinkSharesQuery';
 export * from './queries/useLinksQuery';
+export * from './queries/useLinkVariablesQuery';
 export * from './queries/useLoginQuery';
 export * from './queries/usePerformanceChartQuery';
 export * from './queries/usePerformanceMetricsQuery';

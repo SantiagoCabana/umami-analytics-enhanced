@@ -17,7 +17,7 @@ import { useApi, useConfig, useLinkQuery, useMessages } from '@/components/hooks
 import { useUpdateQuery } from '@/components/hooks/queries/useUpdateQuery';
 import { RefreshCw } from '@/components/icons';
 import { getRandomChars } from '@/lib/generate';
-import { isValidUrl } from '@/lib/url';
+import { isValidLinkDestinationUrl } from '@/lib/link-variables';
 import { setConfig } from '@/store/app';
 
 const generateId = () => getRandomChars(9);
@@ -86,7 +86,7 @@ export function LinkEditForm({
   };
 
   const checkUrl = (url: string) => {
-    if (!isValidUrl(url)) {
+    if (!isValidLinkDestinationUrl(url)) {
       return t(labels.invalidUrl);
     }
     return true;
@@ -127,6 +127,7 @@ export function LinkEditForm({
                 <TextField placeholder="https://example.com" autoComplete="off" />
               </FormField>
             </Grid>
+            <p className="text-sm text-muted">{t(messages.linkVariableHelp)}</p>
 
             {cloudMode ? (
               <FormField

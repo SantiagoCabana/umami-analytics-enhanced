@@ -28,6 +28,7 @@ test('blocks application routes on a registered short domain', async () => {
 test('allows public tracker, replay, pixel, collector, and link routes on a registered short domain', async () => {
   findShortDomainByHostnameMock.mockResolvedValue({ id: 'domain-1' } as any);
 
+  await expect(proxy(request('/', 'link.practis.pe'))).resolves.not.toMatchObject({ status: 404 });
   await expect(proxy(request('/script.js', 'link.practis.pe'))).resolves.not.toMatchObject({
     status: 404,
   });

@@ -33,6 +33,7 @@ export function isAllowedShortDomainPath(
   const trackerPaths = trackerScriptName?.split(',').map(name => name.trim()) || [];
 
   return (
+    path === '/' ||
     path.startsWith('/q/') ||
     path === '/script.js' ||
     path === '/recorder.js' ||

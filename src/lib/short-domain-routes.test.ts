@@ -3,6 +3,7 @@ import { isAllowedShortDomainPath } from './short-domain-routes';
 
 describe('short domain routes', () => {
   test('allows only public tracker, replay, pixel, collector, and short-link routes', () => {
+    expect(isAllowedShortDomainPath('/')).toBe(true);
     expect(isAllowedShortDomainPath('/q/abcdefgh')).toBe(true);
     expect(isAllowedShortDomainPath('/q/_umami-domain-verification')).toBe(true);
     expect(isAllowedShortDomainPath('/script.js')).toBe(true);

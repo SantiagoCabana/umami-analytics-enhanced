@@ -1,9 +1,13 @@
 import { z } from 'zod';
+import { verifyLinkDomain } from '@/lib/link-domain-verification';
 import { isValidLinkUrl, normalizeLinkDomain } from '@/lib/link-domains';
 import { parseRequest } from '@/lib/request';
 import { badRequest, json, serverError, unauthorized } from '@/lib/response';
 import { canManageLinkDomains } from '@/permissions';
-import { createShortDomain, getShortDomains, verifyShortDomain } from '@/queries/prisma';
+import { createShortDomain, getShortDomains } from '@/queries/prisma';
+
+const verificationError =
+  'Point this domain to the application and make its HTTPS verification endpoint available before adding it.';
 
 const domainSchema = z.object({
   hostname: z
@@ -59,13 +63,17 @@ export async function POST(request: Request) {
     return badRequest({ message: 'Enter a valid hostname without a protocol, path, or port.' });
   }
 
+  if (!(await verifyLinkDomain(hostname))) {
+    return badRequest({ message: verificationError });
+  }
+
   try {
     const domain = await createShortDomain({
       hostname,
       rootRedirectUrl: result.data.rootRedirectUrl,
     });
 
-    return json(await verifyShortDomain(domain.id));
+    return json(domain);
   } catch (error: any) {
     if (error.message?.toLowerCase().includes('unique constraint')) {
       return badRequest({ message: 'That domain has already been added.' });

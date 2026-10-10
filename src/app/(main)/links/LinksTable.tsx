@@ -1,11 +1,17 @@
-import { DataColumn, DataTable, type DataTableProps, Row } from '@umami/react-zen';
+import { DataColumn, DataTable, type DataTableProps, Row, Text } from '@umami/react-zen';
 import { useMemo } from 'react';
 import { WebsiteSparkline } from '@/app/(main)/websites/WebsiteSparkline';
 import { DateDistance } from '@/components/common/DateDistance';
 import { ExternalLink } from '@/components/common/ExternalLink';
 import Link from '@/components/common/Link';
 import { SortableLabel } from '@/components/common/SortableLabel';
-import { useLinkListChartsQuery, useMessages, useNavigation, useSlug } from '@/components/hooks';
+import {
+  useLinkListChartsQuery,
+  useMessages,
+  useNavigation,
+  useSlug,
+  useTimezone,
+} from '@/components/hooks';
 import { LinkDeleteButton } from './LinkDeleteButton';
 import { LinkEditButton } from './LinkEditButton';
 
@@ -19,6 +25,7 @@ export function LinksTable({
   ...props
 }: LinksTableProps & { data?: any[] }) {
   const { t, labels } = useMessages();
+  const { formatTimezoneDate } = useTimezone();
   const { websiteId, renderUrl } = useNavigation();
   const { getSlugUrl } = useSlug('link');
   const linkIds = useMemo(() => data.map(row => row.id), [data]);
@@ -31,7 +38,8 @@ export function LinksTable({
       <DataColumn
         id="name"
         label={<SortableLabel label={t(labels.name)} sortKey="name" />}
-        width="1fr"
+        width="1.5fr"
+        className="items-center"
       >
         {({ id, name }: any) => {
           return <Link href={renderUrl(`/links/${id}`)}>{name}</Link>;
@@ -40,8 +48,9 @@ export function LinksTable({
       <DataColumn
         id="slug"
         label={<SortableLabel label={t(labels.link)} sortKey="slug" />}
-        width="2fr"
+        width="1.1fr"
         style={{ minWidth: 0 }}
+        className="items-center"
       >
         {({ slug, domains, isDefaultDomainEnabled }: any) => {
           const url = domains?.[0]?.domain?.hostname
@@ -60,8 +69,9 @@ export function LinksTable({
       <DataColumn
         id="url"
         label={<SortableLabel label={t(labels.destinationUrl)} sortKey="url" />}
-        width="1.5fr"
+        width="1.1fr"
         style={{ minWidth: 0 }}
+        className="items-center"
       >
         {({ url }: any) => {
           return <ExternalLink href={url}>{url}</ExternalLink>;
@@ -72,6 +82,7 @@ export function LinksTable({
         label={<span style={{ whiteSpace: 'normal' }}>{`${t(labels.visitors)} (7d)`}</span>}
         width="140px"
         style={{ minWidth: 0 }}
+        className="items-center"
       >
         {(row: any) => {
           const chart = charts[row.id];
@@ -91,8 +102,13 @@ export function LinksTable({
           <SortableLabel label={t(labels.created)} sortKey="createdAt" defaultDirection="desc" />
         }
         width="150px"
+        className="items-center"
       >
-        {(row: any) => <DateDistance date={new Date(row.createdAt)} strict />}
+        {(row: any) => (
+          <Text title={formatTimezoneDate(row.createdAt, 'PPPpp')}>
+            {formatTimezoneDate(row.createdAt, 'dd-MM-yyyy')}
+          </Text>
+        )}
       </DataColumn>
       <DataColumn
         id="updated"
@@ -100,13 +116,14 @@ export function LinksTable({
           <SortableLabel label={t(labels.updated)} sortKey="updatedAt" defaultDirection="desc" />
         }
         width="150px"
+        className="items-center"
       >
         {(row: any) =>
           row.updatedAt ? <DateDistance date={new Date(row.updatedAt)} strict /> : <span>-</span>
         }
       </DataColumn>
       {showActions && (
-        <DataColumn id="action" align="end" width="72px">
+        <DataColumn id="action" align="end" width="72px" className="items-center">
           {({ id, name }: any) => {
             return (
               <Row gap="2">

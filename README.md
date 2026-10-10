@@ -5,6 +5,10 @@
 <h1 align="center">Umami</h1>
 
 <p align="center">
+  <strong>English</strong> | <a href="docs/README.es.md">Español</a>
+</p>
+
+<p align="center">
   <i>Umami is a privacy-first analytics platform. Traffic, campaigns, behavior, conversions, and revenue in one place — no cookies, no surveillance, self-hosted or in the cloud.</i>
 </p>
 
@@ -62,6 +66,33 @@ The connection URL format:
 ```bash
 postgresql://username:mypassword@localhost:5432/mydb
 ```
+
+### Custom short domains
+
+<p align="center">
+  <img src="src/assets/network.svg" alt="Custom short domains" width="72">
+</p>
+
+Umami Enhanced can publish shortened links on the primary application host and on verified custom
+hosts. A short host exposes only the public link and collection endpoints, so administrative pages
+remain available only on the primary application domain.
+
+Set `BASE_DOMAIN` to the primary application hostname, without a protocol or path:
+
+```bash
+BASE_DOMAIN=url.example.com
+```
+
+Add custom hosts in **Administration -> Domains**. Every custom host requires a root redirect URL.
+Requests to its `/` route redirect there; a nonexistent or unassigned `/q/<slug>` returns `404`.
+Before a host is saved, Umami verifies its public DNS, TLS certificate, and reverse-proxy routing
+through a short-lived signed HTTPS challenge. The same host can serve `/script.js`, `/recorder.js`,
+pixels, and the public collection endpoints without exposing `/admin`, `/login`, or other app routes.
+
+Read the complete guides:
+
+- [Custom short domains (English)](docs/short-domains.en.md)
+- [Dominios de enlaces cortos (Español)](docs/short-domains.md)
 
 ### Build the Application
 

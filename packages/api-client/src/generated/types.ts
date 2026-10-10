@@ -4177,8 +4177,6 @@ export interface operations {
              * @description Date and time the record was last updated.
              */
             updatedAt: string;
-            /** Format: date-time */
-            verifiedAt: string;
           })[];
         };
       };
@@ -4238,8 +4236,6 @@ export interface operations {
              * @description Date and time the record was last updated.
              */
             updatedAt: string;
-            /** Format: date-time */
-            verifiedAt: string;
           };
         };
       };
@@ -4317,28 +4313,7 @@ export interface operations {
         };
         content: {
           'application/json': {
-            _count: {
-              /** @description Tracked links associated with the user. */
-              links: number;
-            };
-          } & {
-            /**
-             * Format: date-time
-             * @description Date and time the record was created.
-             */
-            createdAt: string;
-            /** @description Hostname on which the activity occurred. */
-            hostname: string;
-            /** @description Unique identifier of the resource. */
-            id: string;
-            rootRedirectUrl: string;
-            /**
-             * Format: date-time
-             * @description Date and time the record was last updated.
-             */
-            updatedAt: string;
-            /** Format: date-time */
-            verifiedAt: string;
+            active: boolean;
           };
         };
       };
@@ -4418,8 +4393,6 @@ export interface operations {
              * @description Date and time the record was last updated.
              */
             updatedAt: string;
-            /** Format: date-time */
-            verifiedAt: string;
           };
         };
       };
@@ -6907,8 +6880,6 @@ export interface operations {
                    * @description Date and time the record was last updated.
                    */
                   updatedAt: string;
-                  /** Format: date-time */
-                  verifiedAt: string;
                 };
               } & {
                 /**
@@ -7054,8 +7025,6 @@ export interface operations {
                  * @description Date and time the record was last updated.
                  */
                 updatedAt: string;
-                /** Format: date-time */
-                verifiedAt: string;
               };
             } & {
               /**
@@ -7225,8 +7194,6 @@ export interface operations {
                      * @description Date and time the record was last updated.
                      */
                     updatedAt: string;
-                    /** Format: date-time */
-                    verifiedAt: string;
                   };
                   domainId: string;
                   link: {
@@ -10899,8 +10866,6 @@ export interface operations {
                    * @description Date and time the record was last updated.
                    */
                   updatedAt: string;
-                  /** Format: date-time */
-                  verifiedAt: string;
                 };
               } & {
                 /**

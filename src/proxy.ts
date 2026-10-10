@@ -1,6 +1,9 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { getContentSecurityPolicy } from '@/lib/csp';
+import { getBaseDomain, getRequestLinkDomain } from '@/lib/link-domains';
 import { matchesConfiguredPath } from '@/lib/match-configured-path';
+import { isAllowedShortDomainPath } from '@/lib/short-domain-routes';
+import { findShortDomainByHostname } from '@/queries/prisma';
 
 export const config = {
   matcher: '/:path*',
@@ -11,7 +14,6 @@ const RECORDER_PATH = '/recorder.js';
 const COLLECT_PATH = '/api/send';
 const LOGIN_PATH = '/login';
 const BASE_PATH = process.env.BASE_PATH || '';
-
 const apiHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': '*',
@@ -25,7 +27,6 @@ const trackerHeaders = {
   'Cache-Control': 'public, max-age=86400, must-revalidate',
 };
 
-// Resolved once at startup — env vars don't change after the process starts.
 const contentSecurityPolicy = getContentSecurityPolicy();
 
 function customCollectEndpoint(request: NextRequest) {
@@ -82,10 +83,36 @@ function disableLogin(request: NextRequest) {
   }
 }
 
-export default function middleware(req: NextRequest) {
-  const fns = [customCollectEndpoint, customScriptName, customScriptUrl, disableLogin];
+async function restrictShortDomain(request: NextRequest) {
+  const hostname = getRequestLinkDomain(request);
 
-  let res: NextResponse | undefined;
+  if (!hostname || hostname === getBaseDomain()) {
+    return;
+  }
+
+  const domain = await findShortDomainByHostname(hostname);
+
+  if (
+    domain &&
+    !isAllowedShortDomainPath(request.nextUrl.pathname, {
+      basePath: BASE_PATH,
+      collectApiEndpoint: process.env.COLLECT_API_ENDPOINT,
+      trackerScriptName: process.env.TRACKER_SCRIPT_NAME,
+    })
+  ) {
+    return new NextResponse('Not found', { status: 404 });
+  }
+}
+
+export default async function proxy(req: NextRequest) {
+  let res = await restrictShortDomain(req);
+
+  if (res) {
+    res.headers.set('Content-Security-Policy', contentSecurityPolicy);
+    return res;
+  }
+
+  const fns = [customCollectEndpoint, customScriptName, customScriptUrl, disableLogin];
 
   for (const fn of fns) {
     res = fn(req);
@@ -97,8 +124,6 @@ export default function middleware(req: NextRequest) {
   res ??= NextResponse.next();
   applyStaticScriptHeaders(req, res);
 
-  // Set the CSP here, not only at build time in next.config.ts, so
-  // ALLOWED_FRAME_URLS is resolved from the runtime environment.
   res.headers.set('Content-Security-Policy', contentSecurityPolicy);
 
   return res;

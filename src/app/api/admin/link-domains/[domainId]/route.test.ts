@@ -1,7 +1,8 @@
 import { beforeEach, expect, test, vi } from 'vitest';
+import { verifyLinkDomain } from '@/lib/link-domain-verification';
 import { parseRequest } from '@/lib/request';
 import { canManageLinkDomains } from '@/permissions';
-import { deleteShortDomain, updateShortDomain, verifyShortDomain } from '@/queries/prisma';
+import { deleteShortDomain, findShortDomain, updateShortDomain } from '@/queries/prisma';
 import { DELETE, POST, PUT } from './route';
 
 vi.mock('@/lib/request', () => ({
@@ -12,27 +13,34 @@ vi.mock('@/permissions', () => ({
   canManageLinkDomains: vi.fn(),
 }));
 
+vi.mock('@/lib/link-domain-verification', () => ({
+  verifyLinkDomain: vi.fn(),
+}));
+
 vi.mock('@/queries/prisma', () => ({
   deleteShortDomain: vi.fn(),
+  findShortDomain: vi.fn(),
   updateShortDomain: vi.fn(),
-  verifyShortDomain: vi.fn(),
 }));
 
 const parseRequestMock = vi.mocked(parseRequest);
 const canManageLinkDomainsMock = vi.mocked(canManageLinkDomains);
 const deleteShortDomainMock = vi.mocked(deleteShortDomain);
+const findShortDomainMock = vi.mocked(findShortDomain);
 const updateShortDomainMock = vi.mocked(updateShortDomain);
-const verifyShortDomainMock = vi.mocked(verifyShortDomain);
+const verifyLinkDomainMock = vi.mocked(verifyLinkDomain);
 const params = { params: Promise.resolve({ domainId: 'domain-1' }) };
 
 beforeEach(() => {
   parseRequestMock.mockReset();
   canManageLinkDomainsMock.mockReset();
   deleteShortDomainMock.mockReset();
+  findShortDomainMock.mockReset();
   updateShortDomainMock.mockReset();
-  verifyShortDomainMock.mockReset();
+  verifyLinkDomainMock.mockReset();
   parseRequestMock.mockResolvedValue({ auth: { user: { id: 'admin-1' } }, error: undefined });
   canManageLinkDomainsMock.mockResolvedValue(true);
+  verifyLinkDomainMock.mockResolvedValue(true);
 });
 
 test('POST rejects invalid domain updates with an actionable message', async () => {
@@ -65,7 +73,6 @@ test('POST normalizes and updates a valid domain', async () => {
     error: undefined,
   });
   updateShortDomainMock.mockResolvedValue({ id: 'domain-1' } as any);
-  verifyShortDomainMock.mockResolvedValue({ id: 'domain-1', verifiedAt: null } as any);
 
   const response = await POST(
     new Request('http://localhost/api/admin/link-domains/domain-1', { method: 'POST' }),
@@ -76,24 +83,43 @@ test('POST normalizes and updates a valid domain', async () => {
     hostname: 'link.practis.pe',
     rootRedirectUrl: 'https://practis.pe',
   });
-  expect(verifyShortDomainMock).toHaveBeenCalledWith('domain-1');
+  expect(verifyLinkDomainMock).toHaveBeenCalledWith('link.practis.pe');
   expect(response.status).toBe(200);
 });
 
-test('PUT verifies an existing domain', async () => {
-  verifyShortDomainMock.mockResolvedValue({ id: 'domain-1', verifiedAt: new Date() } as any);
+test('POST does not update a domain that fails verification', async () => {
+  parseRequestMock.mockResolvedValue({
+    auth: { user: { id: 'admin-1' } },
+    body: { hostname: 'link.practis.pe', rootRedirectUrl: 'https://practis.pe' },
+    error: undefined,
+  });
+  verifyLinkDomainMock.mockResolvedValue(false);
+
+  const response = await POST(
+    new Request('http://localhost/api/admin/link-domains/domain-1', { method: 'POST' }),
+    params,
+  );
+
+  expect(response.status).toBe(400);
+  expect(updateShortDomainMock).not.toHaveBeenCalled();
+});
+
+test('PUT checks an existing domain without writing a verification status', async () => {
+  findShortDomainMock.mockResolvedValue({ id: 'domain-1', hostname: 'link.practis.pe' } as any);
+  verifyLinkDomainMock.mockResolvedValue(true);
 
   const response = await PUT(
     new Request('http://localhost/api/admin/link-domains/domain-1', { method: 'PUT' }),
     params,
   );
 
-  expect(verifyShortDomainMock).toHaveBeenCalledWith('domain-1');
+  await expect(response.json()).resolves.toEqual({ active: true });
+  expect(verifyLinkDomainMock).toHaveBeenCalledWith('link.practis.pe');
   expect(response.status).toBe(200);
 });
 
 test('PUT returns not found when the domain does not exist', async () => {
-  verifyShortDomainMock.mockResolvedValue(null);
+  findShortDomainMock.mockResolvedValue(null);
 
   const response = await PUT(
     new Request('http://localhost/api/admin/link-domains/domain-1', { method: 'PUT' }),

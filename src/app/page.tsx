@@ -14,7 +14,7 @@ export default async function RootPage() {
 
   if (domain) {
     if (!domain.rootRedirectUrl) {
-      notFound();
+      return notFound();
     }
 
     redirect(domain.rootRedirectUrl);

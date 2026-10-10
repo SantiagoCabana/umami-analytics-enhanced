@@ -153,14 +153,11 @@ export function SideNav(props: any) {
           </Column>
         )}
       </OverlayScrollArea>
-      <Row
-        paddingTop="2"
-        width="100%"
-        justifyContent={isCollapsed ? 'center' : undefined}
-        style={{ flexShrink: 0 }}
-      >
-        <UserButton showText={!isCollapsed} />
-      </Row>
+      <Column paddingTop="2" width="100%" style={{ flexShrink: 0 }}>
+        <Row width="100%" justifyContent={isCollapsed ? 'center' : undefined}>
+          <UserButton showText={!isCollapsed} />
+        </Row>
+      </Column>
     </Column>
   );
 }

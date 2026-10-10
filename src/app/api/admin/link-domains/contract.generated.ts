@@ -61,19 +61,8 @@ const operation1 = defineOperation({
                       rootRedirectUrl: {
                         type: 'string',
                       },
-                      verifiedAt: {
-                        type: 'string',
-                        format: 'date-time',
-                      },
                     },
-                    required: [
-                      'id',
-                      'createdAt',
-                      'updatedAt',
-                      'hostname',
-                      'rootRedirectUrl',
-                      'verifiedAt',
-                    ],
+                    required: ['id', 'createdAt', 'updatedAt', 'hostname', 'rootRedirectUrl'],
                   },
                 ],
               },
@@ -158,19 +147,8 @@ const operation2 = defineOperation({
                     rootRedirectUrl: {
                       type: 'string',
                     },
-                    verifiedAt: {
-                      type: 'string',
-                      format: 'date-time',
-                    },
                   },
-                  required: [
-                    'id',
-                    'createdAt',
-                    'updatedAt',
-                    'hostname',
-                    'rootRedirectUrl',
-                    'verifiedAt',
-                  ],
+                  required: ['id', 'createdAt', 'updatedAt', 'hostname', 'rootRedirectUrl'],
                 },
               ],
             },

@@ -19,16 +19,18 @@ vi.mock('@/queries/prisma', () => ({
 }));
 
 import { headers } from 'next/headers';
-import { redirect } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { findShortDomainByHostname } from '@/queries/prisma';
 
 const headersMock = vi.mocked(headers);
 const redirectMock = vi.mocked(redirect);
+const notFoundMock = vi.mocked(notFound);
 const findShortDomainByHostnameMock = vi.mocked(findShortDomainByHostname);
 
 beforeEach(() => {
   headersMock.mockResolvedValue(new Headers({ host: 'localhost:3000' }) as any);
   redirectMock.mockReset();
+  notFoundMock.mockReset();
   findShortDomainByHostnameMock.mockReset();
   vi.stubEnv('BASE_DOMAIN', 'localhost');
 });
@@ -50,4 +52,14 @@ test('redirects the root of an additional registered short domain', async () => 
 
   expect(findShortDomainByHostnameMock).toHaveBeenCalledWith('go.example.com');
   expect(redirectMock).toHaveBeenCalledWith('https://example.com');
+});
+
+test('returns not found if a legacy short domain has no root redirect', async () => {
+  headersMock.mockResolvedValue(new Headers({ host: 'go.example.com' }) as any);
+  findShortDomainByHostnameMock.mockResolvedValue({ rootRedirectUrl: null } as any);
+
+  await RootPage();
+
+  expect(notFoundMock).toHaveBeenCalled();
+  expect(redirectMock).not.toHaveBeenCalled();
 });

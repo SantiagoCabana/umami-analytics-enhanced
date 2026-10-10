@@ -372,6 +372,8 @@ export const labels: Record<string, string> = {
   verify: 'label.verify',
   verified: 'label.verified',
   unverified: 'label.unverified',
+  active: 'label.active',
+  inactive: 'label.inactive',
   defaultDomain: 'label.default-domain',
   unassigned: 'label.unassigned',
   linkDisabled: 'message.link-disabled',

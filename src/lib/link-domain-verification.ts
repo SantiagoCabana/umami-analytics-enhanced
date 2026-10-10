@@ -1,22 +1,48 @@
 import { lookup } from 'node:dns/promises';
 import https from 'node:https';
 import ipaddr from 'ipaddr.js';
+import { secret } from '@/lib/crypto';
+import { createToken, parseToken } from '@/lib/jwt';
+import { getRequestLinkDomain } from '@/lib/link-domains';
 
 const VERIFICATION_PATH = '/q/_umami-domain-verification';
 const TIMEOUT = 5000;
 const MAX_RESPONSE_SIZE = 1024;
+const VERIFICATION_TYPE = 'link-domain-verification';
 
 export function isPublicLinkDomainAddress(address: string) {
   return ipaddr.isValid(address) && ipaddr.parse(address).range() === 'unicast';
 }
 
-async function requestVerification(hostname: string, address: string) {
+export function getLinkDomainVerificationHostname(request: Request) {
+  const hostname = getRequestLinkDomain(request);
+  const challenge = new URL(request.url).searchParams.get('challenge');
+  const payload = challenge ? parseToken(challenge, secret()) : null;
+
+  if (
+    !hostname ||
+    !payload ||
+    typeof payload === 'string' ||
+    payload.type !== VERIFICATION_TYPE ||
+    payload.hostname !== hostname
+  ) {
+    return null;
+  }
+
+  return hostname;
+}
+
+function createLinkDomainVerificationChallenge(hostname: string) {
+  return createToken({ type: VERIFICATION_TYPE, hostname }, secret(), { expiresIn: '5m' });
+}
+
+async function requestVerification(hostname: string, address: string, challenge: string) {
   return new Promise<boolean>(resolve => {
     const request = https.get(
       {
         hostname: address,
         servername: hostname,
-        path: VERIFICATION_PATH,
+        path: `${VERIFICATION_PATH}?challenge=${encodeURIComponent(challenge)}`,
         headers: { host: hostname },
         timeout: TIMEOUT,
       },
@@ -38,7 +64,8 @@ async function requestVerification(hostname: string, address: string) {
           }
 
           try {
-            resolve(JSON.parse(body).hostname === hostname);
+            const result = JSON.parse(body);
+            resolve(result.hostname === hostname && result.challenge === challenge);
           } catch {
             resolve(false);
           }
@@ -54,9 +81,13 @@ async function requestVerification(hostname: string, address: string) {
 export async function verifyLinkDomain(hostname: string) {
   try {
     const addresses = await lookup(hostname, { all: true, verbatim: true });
+    const challenge = createLinkDomainVerificationChallenge(hostname);
 
     for (const { address } of addresses) {
-      if (isPublicLinkDomainAddress(address) && (await requestVerification(hostname, address))) {
+      if (
+        isPublicLinkDomainAddress(address) &&
+        (await requestVerification(hostname, address, challenge))
+      ) {
         return true;
       }
     }

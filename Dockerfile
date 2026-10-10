@@ -31,8 +31,6 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/packages/api-client/node_modules ./packages/api-client/node_modules
 COPY --from=deps /app/packages/mcp/node_modules ./packages/mcp/node_modules
 COPY . .
-COPY docker/proxy.ts ./src
-
 ARG BASE_PATH
 
 ENV BASE_PATH=$BASE_PATH

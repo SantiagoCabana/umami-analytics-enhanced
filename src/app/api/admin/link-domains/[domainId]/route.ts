@@ -1,9 +1,13 @@
 import { z } from 'zod';
+import { verifyLinkDomain } from '@/lib/link-domain-verification';
 import { isValidLinkUrl, normalizeLinkDomain } from '@/lib/link-domains';
 import { parseRequest } from '@/lib/request';
 import { badRequest, json, notFound, ok, serverError, unauthorized } from '@/lib/response';
 import { canManageLinkDomains } from '@/permissions';
-import { deleteShortDomain, updateShortDomain, verifyShortDomain } from '@/queries/prisma';
+import { deleteShortDomain, findShortDomain, updateShortDomain } from '@/queries/prisma';
+
+const verificationError =
+  'Point this domain to the application and make its HTTPS verification endpoint available before saving it.';
 
 const domainSchema = z.object({
   hostname: z
@@ -50,13 +54,17 @@ export async function POST(
 
   const { domainId } = await params;
 
+  if (!(await verifyLinkDomain(hostname))) {
+    return badRequest({ message: verificationError });
+  }
+
   try {
     const domain = await updateShortDomain(domainId, {
       hostname,
       rootRedirectUrl: result.data.rootRedirectUrl,
     });
 
-    return json(await verifyShortDomain(domain.id));
+    return json(domain);
   } catch (error: any) {
     if (error.message?.toLowerCase().includes('not found')) {
       return notFound();
@@ -82,9 +90,13 @@ export async function PUT(request: Request, { params }: { params: Promise<{ doma
   }
 
   const { domainId } = await params;
-  const domain = await verifyShortDomain(domainId);
+  const domain = await findShortDomain(domainId);
 
-  return domain ? json(domain) : notFound();
+  if (!domain) {
+    return notFound();
+  }
+
+  return json({ active: await verifyLinkDomain(domain.hostname) });
 }
 
 export async function DELETE(

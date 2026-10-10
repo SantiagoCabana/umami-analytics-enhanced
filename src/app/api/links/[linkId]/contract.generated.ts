@@ -381,10 +381,6 @@ const operation2 = defineOperation({
                                       rootRedirectUrl: {
                                         type: 'string',
                                       },
-                                      verifiedAt: {
-                                        type: 'string',
-                                        format: 'date-time',
-                                      },
                                     },
                                     required: [
                                       'id',
@@ -392,7 +388,6 @@ const operation2 = defineOperation({
                                       'updatedAt',
                                       'hostname',
                                       'rootRedirectUrl',
-                                      'verifiedAt',
                                     ],
                                     description: 'Domain name associated with the resource.',
                                   },

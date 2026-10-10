@@ -1,6 +1,5 @@
 import type { Prisma } from '@/generated/prisma/client';
 import { uuid } from '@/lib/crypto';
-import { verifyLinkDomain } from '@/lib/link-domain-verification';
 import prisma from '@/lib/prisma';
 
 const shortDomainInclude = {
@@ -14,6 +13,13 @@ const shortDomainInclude = {
 export async function findShortDomainByHostname(hostname: string) {
   return prisma.client.shortDomain.findUnique({
     where: { hostname },
+    include: shortDomainInclude,
+  });
+}
+
+export async function findShortDomain(shortDomainId: string) {
+  return prisma.client.shortDomain.findUnique({
+    where: { id: shortDomainId },
     include: shortDomainInclude,
   });
 }
@@ -70,25 +76,6 @@ export async function updateShortDomain(
   return prisma.client.shortDomain.update({
     where: { id: shortDomainId },
     data,
-    include: shortDomainInclude,
-  });
-}
-
-export async function verifyShortDomain(shortDomainId: string) {
-  const domain = await prisma.client.shortDomain.findUnique({
-    where: { id: shortDomainId },
-    select: { hostname: true },
-  });
-
-  if (!domain) {
-    return null;
-  }
-
-  const verified = await verifyLinkDomain(domain.hostname);
-
-  return prisma.client.shortDomain.update({
-    where: { id: shortDomainId },
-    data: { verifiedAt: verified ? new Date() : null },
     include: shortDomainInclude,
   });
 }

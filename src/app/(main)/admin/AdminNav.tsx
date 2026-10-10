@@ -37,6 +37,12 @@ export function AdminNav({ onItemClick }: { onItemClick?: () => void }) {
           path: '/admin/security',
           icon: <ShieldCheck />,
         },
+        {
+          id: 'domains',
+          label: t(labels.domains),
+          path: '/admin/domains',
+          icon: <Globe />,
+        },
       ],
     },
   ];

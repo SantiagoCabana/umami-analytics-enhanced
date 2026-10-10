@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic';
 
 import { NextResponse } from 'next/server';
 import { POST } from '@/app/api/send/route';
+import { getLinkDomainVerificationHostname } from '@/lib/link-domain-verification';
 import { getLinkCacheKey, getRequestLinkDomain } from '@/lib/link-domains';
 import redis from '@/lib/redis';
 import { notFound } from '@/lib/response';
@@ -14,11 +15,19 @@ import {
 export async function GET(request: Request, { params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const hostname = getRequestLinkDomain(request);
-  const domain = hostname ? await findShortDomainByHostname(hostname) : null;
 
-  if (domain && slug === '_umami-domain-verification') {
-    return NextResponse.json({ hostname: domain.hostname });
+  if (slug === '_umami-domain-verification') {
+    const verifiedHostname = getLinkDomainVerificationHostname(request);
+
+    return verifiedHostname
+      ? NextResponse.json({
+          hostname: verifiedHostname,
+          challenge: new URL(request.url).searchParams.get('challenge'),
+        })
+      : notFound();
   }
+
+  const domain = hostname ? await findShortDomainByHostname(hostname) : null;
 
   const cacheKey = domain ? getLinkCacheKey(domain.hostname, slug) : `link:${slug}`;
   const queryLink = () =>

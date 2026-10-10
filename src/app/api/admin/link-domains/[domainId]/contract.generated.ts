@@ -161,19 +161,8 @@ const operation2 = defineOperation({
                     rootRedirectUrl: {
                       type: 'string',
                     },
-                    verifiedAt: {
-                      type: 'string',
-                      format: 'date-time',
-                    },
                   },
-                  required: [
-                    'id',
-                    'createdAt',
-                    'updatedAt',
-                    'hostname',
-                    'rootRedirectUrl',
-                    'verifiedAt',
-                  ],
+                  required: ['id', 'createdAt', 'updatedAt', 'hostname', 'rootRedirectUrl'],
                 },
               ],
             },
@@ -277,62 +266,13 @@ const operation3 = defineOperation({
         content: {
           'application/json': {
             schema: {
-              allOf: [
-                {
-                  type: 'object',
-                  properties: {
-                    _count: {
-                      type: 'object',
-                      properties: {
-                        links: {
-                          type: 'number',
-                          description: 'Tracked links associated with the user.',
-                        },
-                      },
-                      required: ['links'],
-                    },
-                  },
-                  required: ['_count'],
+              type: 'object',
+              properties: {
+                active: {
+                  type: 'boolean',
                 },
-                {
-                  type: 'object',
-                  properties: {
-                    id: {
-                      type: 'string',
-                      description: 'Unique identifier of the resource.',
-                    },
-                    createdAt: {
-                      type: 'string',
-                      format: 'date-time',
-                      description: 'Date and time the record was created.',
-                    },
-                    updatedAt: {
-                      type: 'string',
-                      format: 'date-time',
-                      description: 'Date and time the record was last updated.',
-                    },
-                    hostname: {
-                      type: 'string',
-                      description: 'Hostname on which the activity occurred.',
-                    },
-                    rootRedirectUrl: {
-                      type: 'string',
-                    },
-                    verifiedAt: {
-                      type: 'string',
-                      format: 'date-time',
-                    },
-                  },
-                  required: [
-                    'id',
-                    'createdAt',
-                    'updatedAt',
-                    'hostname',
-                    'rootRedirectUrl',
-                    'verifiedAt',
-                  ],
-                },
-              ],
+              },
+              required: ['active'],
             },
           },
         },

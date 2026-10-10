@@ -99,6 +99,8 @@
     "verify": "Verify",
     "verified": "Verified",
     "unverified": "Not verified",
+    "active": "Active",
+    "inactive": "Inactive",
     "unassigned": "Unassigned",
     "root-redirect-url": "Root redirect URL",
     "details": "Details",

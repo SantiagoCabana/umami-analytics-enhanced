@@ -1,5 +1,6 @@
 import { beforeEach, expect, test, vi } from 'vitest';
 import { POST } from '@/app/api/send/route';
+import { getLinkDomainVerificationHostname } from '@/lib/link-domain-verification';
 import redis from '@/lib/redis';
 import {
   findLinkByDefaultDomain,
@@ -10,6 +11,10 @@ import { GET } from './route';
 
 vi.mock('@/app/api/send/route', () => ({
   POST: vi.fn(),
+}));
+
+vi.mock('@/lib/link-domain-verification', () => ({
+  getLinkDomainVerificationHostname: vi.fn(),
 }));
 
 vi.mock('@/lib/redis', () => ({
@@ -29,6 +34,7 @@ const findLinkByDefaultDomainMock = vi.mocked(findLinkByDefaultDomain);
 const findLinkByDomainMock = vi.mocked(findLinkByDomain);
 const findShortDomainByHostnameMock = vi.mocked(findShortDomainByHostname);
 const postMock = vi.mocked(POST);
+const getLinkDomainVerificationHostnameMock = vi.mocked(getLinkDomainVerificationHostname);
 
 const params = { params: Promise.resolve({ slug: 'abcdefgh' }) };
 const verificationParams = { params: Promise.resolve({ slug: '_umami-domain-verification' }) };
@@ -41,6 +47,7 @@ beforeEach(() => {
   findLinkByDomainMock.mockReset();
   findShortDomainByHostnameMock.mockReset();
   postMock.mockReset();
+  getLinkDomainVerificationHostnameMock.mockReset();
   redis.enabled = false;
 });
 
@@ -58,17 +65,36 @@ test('redirects a link from an assigned custom domain', async () => {
   expect(response.headers.get('location')).toBe('https://destination.example.com/');
 });
 
-test('returns the domain verification document for a registered domain', async () => {
-  findShortDomainByHostnameMock.mockResolvedValue({
-    id: 'domain-1',
+test('returns the signed domain verification document before the domain is registered', async () => {
+  getLinkDomainVerificationHostnameMock.mockReturnValue('go.example.com');
+
+  const response = await GET(
+    new Request('https://go.example.com/q/_umami-domain-verification?challenge=challenge-1', {
+      headers: { host: 'go.example.com' },
+    }),
+    verificationParams,
+  );
+
+  await expect(response.json()).resolves.toEqual({
     hostname: 'go.example.com',
-  } as any);
-
-  const response = await GET(request('go.example.com'), verificationParams);
-
-  await expect(response.json()).resolves.toEqual({ hostname: 'go.example.com' });
+    challenge: 'challenge-1',
+  });
+  expect(findShortDomainByHostnameMock).not.toHaveBeenCalled();
   expect(findLinkByDomainMock).not.toHaveBeenCalled();
   expect(postMock).not.toHaveBeenCalled();
+});
+
+test('rejects an invalid domain verification challenge', async () => {
+  getLinkDomainVerificationHostnameMock.mockReturnValue(null);
+
+  const response = await GET(
+    new Request('https://go.example.com/q/_umami-domain-verification', {
+      headers: { host: 'go.example.com' },
+    }),
+    verificationParams,
+  );
+
+  expect(response.status).toBe(404);
 });
 
 test('redirects a link without custom domains from the default domain', async () => {

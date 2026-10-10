@@ -376,8 +376,7 @@ model LinkDomain {
 model ShortDomain {
   id              String    @id() @map("short_domain_id") @db.Uuid
   hostname        String    @unique() @db.VarChar(255)
-  rootRedirectUrl String?   @map("root_redirect_url") @db.VarChar(500)
-  verifiedAt      DateTime? @map("verified_at") @db.Timestamptz(6)
+  rootRedirectUrl String    @map("root_redirect_url") @db.VarChar(500)
   createdAt       DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt       DateTime? @updatedAt @map("updated_at") @db.Timestamptz(6)
 

@@ -31,10 +31,31 @@ export async function request(
     },
     body,
   }).then(async res => {
-    const data = await res.json();
+    const text = await res.text();
+    let data: any;
+    let parseError: string | undefined;
+
+    if (text) {
+      try {
+        data = JSON.parse(text);
+      } catch {
+        parseError = `Unexpected response from ${url}`;
+      }
+    } else {
+      parseError = `Empty response from ${url}`;
+    }
+
+    if (parseError) {
+      data = {
+        error: {
+          message: parseError,
+          status: res.status,
+        },
+      };
+    }
 
     return {
-      ok: res.ok,
+      ok: res.ok && !parseError,
       status: res.status,
       data,
     };

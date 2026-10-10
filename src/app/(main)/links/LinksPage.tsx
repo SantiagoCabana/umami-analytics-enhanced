@@ -1,5 +1,5 @@
 'use client';
-import { Column } from '@umami/react-zen';
+import { Column, Row } from '@umami/react-zen';
 import { LinksDataTable } from '@/app/(main)/links/LinksDataTable';
 import { PageBody } from '@/components/common/PageBody';
 import { PageHeader } from '@/components/common/PageHeader';
@@ -7,6 +7,7 @@ import { Panel } from '@/components/common/Panel';
 import { useLoginQuery, useMessages, useNavigation, useTeamMembersQuery } from '@/components/hooks';
 import { ROLES } from '@/lib/constants';
 import { LinkAddButton } from './LinkAddButton';
+import { ShortDomainManageButton } from './ShortDomainManageButton';
 
 export function LinksPage() {
   const { user } = useLoginQuery();
@@ -21,10 +22,17 @@ export function LinksPage() {
     (!teamId && user.role !== ROLES.viewOnly);
 
   return (
-    <PageBody>
+    <PageBody maxWidth="1680px">
       <Column gap="6" margin="2">
         <PageHeader title={t(labels.links)}>
-          {showActions && <LinkAddButton teamId={teamId} />}
+          <Row alignItems="center" gap="3">
+            {user?.isAdmin && (
+              <div className={showActions ? 'border-e border-edge pe-3' : undefined}>
+                <ShortDomainManageButton />
+              </div>
+            )}
+            {showActions && <LinkAddButton teamId={teamId} />}
+          </Row>
         </PageHeader>
         <Panel>
           <LinksDataTable showActions={showActions} />

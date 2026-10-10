@@ -10,7 +10,9 @@ const operation1 = defineOperation({
   auth: 'bearer',
   operation: {
     operationId: 'deleteWebsiteSession',
-    summary: 'Delete websites website id sessions session id',
+    summary: 'Delete a visitor session',
+    description:
+      'Deletes the specified session and its associated analytics data. Available on installations using only a relational database.',
     tags: ['Websites'],
     parameters: [
       {
@@ -20,6 +22,7 @@ const operation1 = defineOperation({
         schema: {
           type: 'string',
         },
+        description: 'ID of the website.',
       },
       {
         name: 'sessionId',
@@ -28,6 +31,7 @@ const operation1 = defineOperation({
         schema: {
           type: 'string',
         },
+        description: 'ID of the visitor session.',
       },
     ],
     responses: {
@@ -40,6 +44,7 @@ const operation1 = defineOperation({
               properties: {
                 ok: {
                   const: true,
+                  description: 'Whether the operation succeeded.',
                 },
               },
               required: ['ok'],
@@ -109,7 +114,9 @@ const operation2 = defineOperation({
   auth: 'bearer-or-share',
   operation: {
     operationId: 'getWebsiteSession',
-    summary: 'Get websites website id sessions session id',
+    summary: 'Get a visitor session',
+    description:
+      'Returns details for a website session, including linked visitor identities and whether session deletion is available to the caller.',
     tags: ['Websites'],
     parameters: [
       {
@@ -119,6 +126,7 @@ const operation2 = defineOperation({
         schema: {
           type: 'string',
         },
+        description: 'ID of the website.',
       },
       {
         name: 'sessionId',
@@ -127,6 +135,7 @@ const operation2 = defineOperation({
         schema: {
           type: 'string',
         },
+        description: 'ID of the visitor session.',
       },
     ],
     responses: {
@@ -138,9 +147,10 @@ const operation2 = defineOperation({
               type: 'object',
               properties: {
                 canDelete: {},
+                distinctIds: {},
                 stitchedSessionCount: {},
               },
-              required: ['canDelete', 'stitchedSessionCount'],
+              required: ['canDelete', 'distinctIds', 'stitchedSessionCount'],
             },
           },
         },

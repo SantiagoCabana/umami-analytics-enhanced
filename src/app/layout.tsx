@@ -23,7 +23,7 @@ export default function ({ children }) {
   }
 
   return (
-    <html lang="en" className={`${inter.className} ${inter.variable}`}>
+    <html lang="en" className={`${inter.className} ${inter.variable}`} suppressHydrationWarning>
       <head>
         <link rel="icon" href="/favicon.ico" />
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />

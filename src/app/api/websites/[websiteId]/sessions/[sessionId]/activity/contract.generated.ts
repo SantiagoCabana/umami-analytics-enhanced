@@ -10,7 +10,9 @@ const operation1 = defineOperation({
   auth: 'bearer-or-share',
   operation: {
     operationId: 'getWebsiteSessionActivity',
-    summary: 'Get websites website id sessions session id activity',
+    summary: "Get a visitor's session activity",
+    description:
+      'Returns activity for the specified session and sessions linked by visitor identity, using the requested date range and optional distinct ID.',
     tags: ['Websites'],
     parameters: [
       {
@@ -20,6 +22,7 @@ const operation1 = defineOperation({
         schema: {
           type: 'string',
         },
+        description: 'ID of the website.',
       },
       {
         name: 'sessionId',
@@ -28,6 +31,7 @@ const operation1 = defineOperation({
         schema: {
           type: 'string',
         },
+        description: 'ID of the visitor session.',
       },
       {
         name: 'startAt',
@@ -36,6 +40,7 @@ const operation1 = defineOperation({
         schema: {
           type: 'integer',
         },
+        description: 'Start of the date range as a Unix timestamp in milliseconds.',
       },
       {
         name: 'endAt',
@@ -44,6 +49,7 @@ const operation1 = defineOperation({
         schema: {
           type: 'integer',
         },
+        description: 'End of the date range as a Unix timestamp in milliseconds.',
       },
       {
         name: 'distinctId',
@@ -52,6 +58,7 @@ const operation1 = defineOperation({
         schema: {
           type: 'string',
         },
+        description: 'Custom identifier assigned to the visitor.',
       },
     ],
     responses: {
@@ -74,30 +81,39 @@ const operation1 = defineOperation({
                         format: 'date-time',
                       },
                     ],
+                    description: 'Date and time the record was created.',
                   },
                   urlPath: {
                     type: 'string',
+                    description: 'Path portion of the page URL.',
                   },
                   urlQuery: {
                     type: 'string',
+                    description: 'Query string portion of the page URL.',
                   },
                   referrerDomain: {
                     type: 'string',
+                    description: 'Domain of the referring page.',
                   },
                   eventId: {
                     type: 'string',
+                    description: 'ID of the event.',
                   },
                   eventType: {
                     type: 'number',
+                    description: 'Event type: 1 for a pageview or 2 for a custom event.',
                   },
                   eventName: {
                     type: 'string',
+                    description: 'Name of the custom event.',
                   },
                   visitId: {
                     type: 'string',
+                    description: 'ID of the visit.',
                   },
                   hostname: {
                     type: 'string',
+                    description: 'Hostname on which the activity occurred.',
                   },
                   hasData: {
                     type: 'boolean',

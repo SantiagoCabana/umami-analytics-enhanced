@@ -220,12 +220,12 @@ model SessionData {
   website Website @relation(fields: [websiteId], references: [id])
   session Session @relation(fields: [sessionId], references: [id])
 
+  @@unique([sessionId, dataKey])
   @@index([createdAt])
   @@index([websiteId])
   @@index([sessionId])
   @@index([sessionId, createdAt])
   @@index([websiteId, createdAt, dataKey])
-  @@unique([sessionId, dataKey])
   @@map("session_data")
 }
 
@@ -338,24 +338,52 @@ model Revenue {
 }
 
 model Link {
-  id        String    @id() @map("link_id") @db.Uuid
-  name      String    @db.VarChar(100)
-  url       String    @db.VarChar(500)
-  slug      String    @unique() @db.VarChar(100)
-  userId    String?   @map("user_id") @db.Uuid
-  teamId    String?   @map("team_id") @db.Uuid
-  createdAt DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt DateTime? @updatedAt @map("updated_at") @db.Timestamptz(6)
-  deletedAt DateTime? @map("deleted_at") @db.Timestamptz(6)
+  id                     String    @id() @map("link_id") @db.Uuid
+  name                   String    @db.VarChar(100)
+  url                    String    @db.VarChar(500)
+  slug                   String    @unique() @db.VarChar(100)
+  isDefaultDomainEnabled Boolean   @default(true) @map("is_default_domain_enabled")
+  userId                 String?   @map("user_id") @db.Uuid
+  teamId                 String?   @map("team_id") @db.Uuid
+  createdAt              DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt              DateTime? @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt              DateTime? @map("deleted_at") @db.Timestamptz(6)
 
-  user User? @relation("user", fields: [userId], references: [id])
-  team Team? @relation(fields: [teamId], references: [id])
+  user    User?        @relation("user", fields: [userId], references: [id])
+  team    Team?        @relation(fields: [teamId], references: [id])
+  domains LinkDomain[]
 
   @@index([slug])
   @@index([userId])
   @@index([teamId])
   @@index([createdAt])
   @@map("link")
+}
+
+model LinkDomain {
+  linkId    String    @map("link_id") @db.Uuid
+  domainId  String    @map("domain_id") @db.Uuid
+  createdAt DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  link   Link        @relation(fields: [linkId], references: [id], onDelete: Cascade)
+  domain ShortDomain @relation(fields: [domainId], references: [id], onDelete: Restrict)
+
+  @@id([linkId, domainId])
+  @@index([domainId])
+  @@map("link_domain")
+}
+
+model ShortDomain {
+  id              String    @id() @map("short_domain_id") @db.Uuid
+  hostname        String    @unique() @db.VarChar(255)
+  rootRedirectUrl String?   @map("root_redirect_url") @db.VarChar(500)
+  verifiedAt      DateTime? @map("verified_at") @db.Timestamptz(6)
+  createdAt       DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime? @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  links LinkDomain[]
+
+  @@map("short_domain")
 }
 
 model Pixel {

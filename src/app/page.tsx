@@ -1,21 +1,24 @@
-'use client';
-import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
-import { LAST_TEAM_CONFIG } from '@/lib/constants';
-import { getItem } from '@/lib/storage';
+import { headers } from 'next/headers';
+import { notFound, redirect } from 'next/navigation';
+import { RootPageClient } from '@/app/RootPageClient';
+import { getBaseDomain, getRequestLinkDomain } from '@/lib/link-domains';
+import { findShortDomainByHostname } from '@/queries/prisma';
 
-export default function RootPage() {
-  const router = useRouter();
+export const dynamic = 'force-dynamic';
 
-  useEffect(() => {
-    const lastTeam = getItem(LAST_TEAM_CONFIG);
+export default async function RootPage() {
+  const hostname = getRequestLinkDomain({ headers: await headers() });
+  const baseDomain = getBaseDomain();
+  const domain =
+    hostname && hostname !== baseDomain ? await findShortDomainByHostname(hostname) : null;
 
-    if (lastTeam) {
-      router.replace(`/teams/${lastTeam}/websites`);
-    } else {
-      router.replace(`/websites`);
+  if (domain) {
+    if (!domain.rootRedirectUrl) {
+      notFound();
     }
-  }, [router]);
 
-  return null;
+    redirect(domain.rootRedirectUrl);
+  }
+
+  return <RootPageClient />;
 }

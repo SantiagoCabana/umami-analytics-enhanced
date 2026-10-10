@@ -43,3 +43,7 @@ export async function canEnforceTwoFactorAuthForEveryone({ user }: Auth) {
 export async function canEnforceTwoFactorAuthForUser({ user }: Auth) {
   return user?.isAdmin ?? false;
 }
+
+export async function canManageLinkDomains({ user }: Auth) {
+  return user?.isAdmin ?? false;
+}

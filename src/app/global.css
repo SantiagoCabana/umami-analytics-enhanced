@@ -25,6 +25,48 @@ body {
   min-height: 100vh;
 }
 
+/* Native overflow regions follow Zen's light and dark theme tokens. */
+* {
+  scrollbar-color: var(--zen-palette-300) var(--zen-palette-50);
+  scrollbar-width: thin;
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--zen-palette-50);
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--zen-palette-300);
+  border: 2px solid var(--zen-palette-50);
+  border-radius: 999px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--zen-palette-400);
+}
+
+[data-theme="dark"] * {
+  scrollbar-color: var(--zen-palette-600) var(--zen-palette-800);
+}
+
+[data-theme="dark"] *::-webkit-scrollbar-track {
+  background: var(--zen-palette-800);
+}
+
+[data-theme="dark"] *::-webkit-scrollbar-thumb {
+  background: var(--zen-palette-600);
+  border-color: var(--zen-palette-800);
+}
+
+[data-theme="dark"] *::-webkit-scrollbar-thumb:hover {
+  background: var(--zen-palette-500);
+}
+
 body {
   font-size: 0.875rem;
 }

@@ -10,7 +10,9 @@ const operation1 = defineOperation({
   auth: 'none',
   operation: {
     operationId: 'getConfig',
-    summary: 'Get config',
+    summary: 'Get application configuration',
+    description:
+      'Returns public application settings, including deployment mode, feature availability, and tracker and resource URLs.',
     tags: ['Configuration'],
     responses: {
       '200': {
@@ -26,7 +28,13 @@ const operation1 = defineOperation({
                 faviconUrl: {
                   type: 'string',
                 },
-                linksUrl: {
+                linkDomains: {
+                  type: 'array',
+                  items: {
+                    type: 'string',
+                  },
+                },
+                baseDomain: {
                   type: 'string',
                 },
                 pixelsUrl: {
@@ -51,7 +59,8 @@ const operation1 = defineOperation({
               required: [
                 'cloudMode',
                 'faviconUrl',
-                'linksUrl',
+                'linkDomains',
+                'baseDomain',
                 'pixelsUrl',
                 'privateMode',
                 'sessionDeletionEnabled',
@@ -59,6 +68,23 @@ const operation1 = defineOperation({
                 'trackerScriptName',
                 'updatesDisabled',
               ],
+            },
+          },
+        },
+      },
+      '500': {
+        description: 'Server error.',
+        content: {
+          'application/json': {
+            example: {
+              error: {
+                message: 'Server error.',
+                code: 'server-error',
+                status: 500,
+              },
+            },
+            schema: {
+              $ref: '#/components/schemas/ApiError',
             },
           },
         },

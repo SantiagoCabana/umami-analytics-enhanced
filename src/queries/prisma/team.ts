@@ -1,6 +1,7 @@
 import { Prisma, type Team, type TeamUser } from '@/generated/prisma/client';
 import { ROLES } from '@/lib/constants';
 import { uuid } from '@/lib/crypto';
+import { getLinkCacheKeys } from '@/lib/link-domains';
 import prisma from '@/lib/prisma';
 import redis from '@/lib/redis';
 import { sanitizeSortFilters } from '@/lib/sort';
@@ -166,7 +167,12 @@ export async function deleteTeam(teamId: string) {
   const [links, pixels, boards] = await Promise.all([
     client.link.findMany({
       where: { teamId },
-      select: { id: true, slug: true, deletedAt: true },
+      select: {
+        id: true,
+        slug: true,
+        deletedAt: true,
+        domains: { select: { domain: { select: { hostname: true } } } },
+      },
     }),
     client.pixel.findMany({
       where: { teamId },
@@ -176,13 +182,20 @@ export async function deleteTeam(teamId: string) {
   ]);
   const entityIds = [...links.map(l => l.id), ...pixels.map(p => p.id), ...boards.map(b => b.id)];
   // Only invalidate Redis cache for slugs that are still live (not already soft-deleted).
-  const linkSlugs = links.filter(l => !l.deletedAt).map(l => l.slug);
+  const linkCacheKeys = links
+    .filter(link => !link.deletedAt)
+    .flatMap(link =>
+      getLinkCacheKeys(
+        link.slug,
+        link.domains.map(({ domain }) => domain.hostname),
+      ),
+    );
   const pixelSlugs = pixels.filter(p => !p.deletedAt).map(p => p.slug);
 
   const invalidateRedis = async () => {
-    if (redis.enabled && (linkSlugs.length || pixelSlugs.length)) {
+    if (redis.enabled && (linkCacheKeys.length || pixelSlugs.length)) {
       await Promise.all([
-        ...linkSlugs.map(slug => redis.client.del(`link:${slug}`)),
+        ...linkCacheKeys.map(key => redis.client.del(key)),
         ...pixelSlugs.map(slug => redis.client.del(`pixel:${slug}`)),
       ]);
     }

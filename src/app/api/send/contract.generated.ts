@@ -10,7 +10,9 @@ const operation1 = defineOperation({
   auth: 'none',
   operation: {
     operationId: 'send',
-    summary: 'Create or update send',
+    summary: 'Send tracking data',
+    description:
+      'Collects a pageview, custom event, visitor identification, or performance payload and returns session information and a tracking cache token when accepted.',
     tags: ['Collection'],
     requestBody: {
       required: true,
@@ -41,27 +43,38 @@ const operation1 = defineOperation({
                   data: {
                     type: 'object',
                     additionalProperties: true,
+                    description: 'Data returned by the operation.',
                   },
                   hostname: {
                     type: 'string',
+                    description: 'Hostname on which the activity occurred.',
                   },
                   language: {
                     type: 'string',
+                    description: 'Preferred language reported by the visitor browser.',
                   },
                   referrer: {
                     type: 'string',
+                    description: 'URL of the referring page.',
                   },
                   screen: {
                     type: 'string',
+                    description: 'Screen resolution of the visitor device.',
                   },
                   title: {
                     type: 'string',
+                    description: 'Title of the page.',
                   },
                   url: {
                     type: 'string',
+                    description: 'URL associated with the resource.',
                   },
-                  name: {},
-                  tag: {},
+                  name: {
+                    description: 'Display name of the resource.',
+                  },
+                  tag: {
+                    description: 'Tag attached to the tracked activity.',
+                  },
                   ip: {
                     type: 'string',
                   },
@@ -73,15 +86,19 @@ const operation1 = defineOperation({
                   },
                   id: {
                     type: 'string',
+                    description: 'Unique identifier of the resource.',
                   },
                   browser: {
                     type: 'string',
+                    description: 'Browser used by the visitor.',
                   },
                   os: {
                     type: 'string',
+                    description: 'Operating system used by the visitor.',
                   },
                   device: {
                     type: 'string',
+                    description: 'Device category used by the visitor.',
                   },
                   lcp: {
                     type: 'number',
@@ -136,8 +153,12 @@ const operation1 = defineOperation({
                   type: 'object',
                   properties: {
                     cache: {},
-                    sessionId: {},
-                    visitId: {},
+                    sessionId: {
+                      description: 'ID of the visitor session.',
+                    },
+                    visitId: {
+                      description: 'ID of the visit.',
+                    },
                   },
                   required: ['cache', 'sessionId', 'visitId'],
                 },

@@ -10,7 +10,9 @@ const operation1 = defineOperation({
   auth: 'bearer',
   operation: {
     operationId: 'deleteLink',
-    summary: 'Delete links link id',
+    summary: 'Delete a tracked link',
+    description:
+      "Deletes the specified tracked link after checking the caller's permission to remove it.",
     tags: ['Links'],
     parameters: [
       {
@@ -20,6 +22,7 @@ const operation1 = defineOperation({
         schema: {
           type: 'string',
         },
+        description: 'ID of the tracked link.',
       },
     ],
     responses: {
@@ -32,6 +35,7 @@ const operation1 = defineOperation({
               properties: {
                 ok: {
                   const: true,
+                  description: 'Whether the operation succeeded.',
                 },
               },
               required: ['ok'],
@@ -67,7 +71,8 @@ const operation2 = defineOperation({
   auth: 'bearer-or-share',
   operation: {
     operationId: 'getLink',
-    summary: 'Get links link id',
+    summary: 'Get a tracked link',
+    description: 'Returns the specified tracked link, including its destination URL and slug.',
     tags: ['Links'],
     parameters: [
       {
@@ -77,6 +82,7 @@ const operation2 = defineOperation({
         schema: {
           type: 'string',
         },
+        description: 'ID of the tracked link.',
       },
     ],
     responses: {
@@ -85,49 +91,421 @@ const operation2 = defineOperation({
         content: {
           'application/json': {
             schema: {
-              type: 'object',
-              properties: {
-                id: {
-                  type: 'string',
+              allOf: [
+                {
+                  type: 'object',
+                  properties: {
+                    user: {
+                      type: 'object',
+                      properties: {
+                        id: {
+                          type: 'string',
+                          description: 'Unique identifier of the resource.',
+                        },
+                        createdAt: {
+                          type: 'string',
+                          format: 'date-time',
+                          description: 'Date and time the record was created.',
+                        },
+                        updatedAt: {
+                          type: 'string',
+                          format: 'date-time',
+                          description: 'Date and time the record was last updated.',
+                        },
+                        username: {
+                          type: 'string',
+                          description: 'Username of the account.',
+                        },
+                        password: {
+                          type: 'string',
+                          description: 'Password used to authenticate the account.',
+                        },
+                        role: {
+                          type: 'string',
+                          description: 'Permission role assigned to the user.',
+                        },
+                        logoUrl: {
+                          type: 'string',
+                          description: 'URL of the logo image.',
+                        },
+                        displayName: {
+                          type: 'string',
+                        },
+                        twoFactorRequired: {
+                          type: 'boolean',
+                          description: 'Whether two-factor authentication is required.',
+                        },
+                        deletedAt: {
+                          type: 'string',
+                          format: 'date-time',
+                          description: 'Date and time the record was deleted, if applicable.',
+                        },
+                      },
+                      required: [
+                        'id',
+                        'createdAt',
+                        'updatedAt',
+                        'username',
+                        'password',
+                        'role',
+                        'logoUrl',
+                        'displayName',
+                        'twoFactorRequired',
+                        'deletedAt',
+                      ],
+                      description: 'User associated with the resource.',
+                    },
+                    team: {
+                      type: 'object',
+                      properties: {
+                        id: {
+                          type: 'string',
+                          description: 'Unique identifier of the resource.',
+                        },
+                        createdAt: {
+                          type: 'string',
+                          format: 'date-time',
+                          description: 'Date and time the record was created.',
+                        },
+                        updatedAt: {
+                          type: 'string',
+                          format: 'date-time',
+                          description: 'Date and time the record was last updated.',
+                        },
+                        logoUrl: {
+                          type: 'string',
+                          description: 'URL of the logo image.',
+                        },
+                        twoFactorRequired: {
+                          type: 'boolean',
+                          description: 'Whether two-factor authentication is required.',
+                        },
+                        deletedAt: {
+                          type: 'string',
+                          format: 'date-time',
+                          description: 'Date and time the record was deleted, if applicable.',
+                        },
+                        name: {
+                          type: 'string',
+                          description: 'Display name of the resource.',
+                        },
+                        accessCode: {
+                          type: 'string',
+                          description: 'Code used to join the team.',
+                        },
+                      },
+                      required: [
+                        'id',
+                        'createdAt',
+                        'updatedAt',
+                        'logoUrl',
+                        'twoFactorRequired',
+                        'deletedAt',
+                        'name',
+                        'accessCode',
+                      ],
+                      description: 'Team associated with the resource.',
+                    },
+                    id: {
+                      type: 'string',
+                      description: 'Unique identifier of the resource.',
+                    },
+                    userId: {
+                      type: 'string',
+                      description: 'ID of the associated user.',
+                    },
+                    createdAt: {
+                      type: 'string',
+                      format: 'date-time',
+                      description: 'Date and time the record was created.',
+                    },
+                    updatedAt: {
+                      type: 'string',
+                      format: 'date-time',
+                      description: 'Date and time the record was last updated.',
+                    },
+                    deletedAt: {
+                      type: 'string',
+                      format: 'date-time',
+                      description: 'Date and time the record was deleted, if applicable.',
+                    },
+                    _count: {
+                      type: 'object',
+                      properties: {
+                        user: {
+                          type: 'number',
+                          description: 'User associated with the resource.',
+                        },
+                        team: {
+                          type: 'number',
+                          description: 'Team associated with the resource.',
+                        },
+                        domains: {
+                          type: 'number',
+                        },
+                      },
+                      required: ['user', 'team', 'domains'],
+                    },
+                    name: {
+                      type: 'string',
+                      description: 'Display name of the resource.',
+                    },
+                    teamId: {
+                      type: 'string',
+                      description: 'ID of the associated team.',
+                    },
+                    url: {
+                      type: 'string',
+                      description: 'URL associated with the resource.',
+                    },
+                    slug: {
+                      type: 'string',
+                      description: 'URL slug used to access the resource.',
+                    },
+                    isDefaultDomainEnabled: {
+                      type: 'boolean',
+                    },
+                    domains: {
+                      type: 'array',
+                      items: {
+                        anyOf: [
+                          {
+                            type: 'object',
+                            properties: {
+                              createdAt: {
+                                type: 'string',
+                                format: 'date-time',
+                                description: 'Date and time the record was created.',
+                              },
+                              linkId: {
+                                type: 'string',
+                                description: 'ID of the tracked link.',
+                              },
+                              domainId: {
+                                type: 'string',
+                              },
+                            },
+                            required: ['createdAt', 'linkId', 'domainId'],
+                          },
+                          {
+                            allOf: [
+                              {
+                                type: 'object',
+                                properties: {
+                                  link: {
+                                    type: 'object',
+                                    properties: {
+                                      id: {
+                                        type: 'string',
+                                        description: 'Unique identifier of the resource.',
+                                      },
+                                      userId: {
+                                        type: 'string',
+                                        description: 'ID of the associated user.',
+                                      },
+                                      createdAt: {
+                                        type: 'string',
+                                        format: 'date-time',
+                                        description: 'Date and time the record was created.',
+                                      },
+                                      updatedAt: {
+                                        type: 'string',
+                                        format: 'date-time',
+                                        description: 'Date and time the record was last updated.',
+                                      },
+                                      deletedAt: {
+                                        type: 'string',
+                                        format: 'date-time',
+                                        description:
+                                          'Date and time the record was deleted, if applicable.',
+                                      },
+                                      name: {
+                                        type: 'string',
+                                        description: 'Display name of the resource.',
+                                      },
+                                      teamId: {
+                                        type: 'string',
+                                        description: 'ID of the associated team.',
+                                      },
+                                      url: {
+                                        type: 'string',
+                                        description: 'URL associated with the resource.',
+                                      },
+                                      slug: {
+                                        type: 'string',
+                                        description: 'URL slug used to access the resource.',
+                                      },
+                                      isDefaultDomainEnabled: {
+                                        type: 'boolean',
+                                      },
+                                    },
+                                    required: [
+                                      'id',
+                                      'userId',
+                                      'createdAt',
+                                      'updatedAt',
+                                      'deletedAt',
+                                      'name',
+                                      'teamId',
+                                      'url',
+                                      'slug',
+                                      'isDefaultDomainEnabled',
+                                    ],
+                                  },
+                                  createdAt: {
+                                    type: 'string',
+                                    format: 'date-time',
+                                    description: 'Date and time the record was created.',
+                                  },
+                                  domain: {
+                                    type: 'object',
+                                    properties: {
+                                      id: {
+                                        type: 'string',
+                                        description: 'Unique identifier of the resource.',
+                                      },
+                                      createdAt: {
+                                        type: 'string',
+                                        format: 'date-time',
+                                        description: 'Date and time the record was created.',
+                                      },
+                                      updatedAt: {
+                                        type: 'string',
+                                        format: 'date-time',
+                                        description: 'Date and time the record was last updated.',
+                                      },
+                                      hostname: {
+                                        type: 'string',
+                                        description: 'Hostname on which the activity occurred.',
+                                      },
+                                      rootRedirectUrl: {
+                                        type: 'string',
+                                      },
+                                      verifiedAt: {
+                                        type: 'string',
+                                        format: 'date-time',
+                                      },
+                                    },
+                                    required: [
+                                      'id',
+                                      'createdAt',
+                                      'updatedAt',
+                                      'hostname',
+                                      'rootRedirectUrl',
+                                      'verifiedAt',
+                                    ],
+                                    description: 'Domain name associated with the resource.',
+                                  },
+                                  linkId: {
+                                    type: 'string',
+                                    description: 'ID of the tracked link.',
+                                  },
+                                  domainId: {
+                                    type: 'string',
+                                  },
+                                },
+                                required: ['link', 'createdAt', 'domain', 'linkId', 'domainId'],
+                              },
+                              {
+                                type: 'object',
+                                properties: {
+                                  createdAt: {
+                                    type: 'string',
+                                    format: 'date-time',
+                                    description: 'Date and time the record was created.',
+                                  },
+                                  linkId: {
+                                    type: 'string',
+                                    description: 'ID of the tracked link.',
+                                  },
+                                  domainId: {
+                                    type: 'string',
+                                  },
+                                },
+                                required: ['createdAt', 'linkId', 'domainId'],
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                    },
+                  },
+                  required: [
+                    'user',
+                    'team',
+                    'id',
+                    'userId',
+                    'createdAt',
+                    'updatedAt',
+                    'deletedAt',
+                    '_count',
+                    'name',
+                    'teamId',
+                    'url',
+                    'slug',
+                    'isDefaultDomainEnabled',
+                    'domains',
+                  ],
                 },
-                userId: {
-                  type: 'string',
+                {
+                  type: 'object',
+                  properties: {
+                    id: {
+                      type: 'string',
+                      description: 'Unique identifier of the resource.',
+                    },
+                    userId: {
+                      type: 'string',
+                      description: 'ID of the associated user.',
+                    },
+                    createdAt: {
+                      type: 'string',
+                      format: 'date-time',
+                      description: 'Date and time the record was created.',
+                    },
+                    updatedAt: {
+                      type: 'string',
+                      format: 'date-time',
+                      description: 'Date and time the record was last updated.',
+                    },
+                    deletedAt: {
+                      type: 'string',
+                      format: 'date-time',
+                      description: 'Date and time the record was deleted, if applicable.',
+                    },
+                    name: {
+                      type: 'string',
+                      description: 'Display name of the resource.',
+                    },
+                    teamId: {
+                      type: 'string',
+                      description: 'ID of the associated team.',
+                    },
+                    url: {
+                      type: 'string',
+                      description: 'URL associated with the resource.',
+                    },
+                    slug: {
+                      type: 'string',
+                      description: 'URL slug used to access the resource.',
+                    },
+                    isDefaultDomainEnabled: {
+                      type: 'boolean',
+                    },
+                  },
+                  required: [
+                    'id',
+                    'userId',
+                    'createdAt',
+                    'updatedAt',
+                    'deletedAt',
+                    'name',
+                    'teamId',
+                    'url',
+                    'slug',
+                    'isDefaultDomainEnabled',
+                  ],
                 },
-                createdAt: {
-                  type: 'string',
-                  format: 'date-time',
-                },
-                updatedAt: {
-                  type: 'string',
-                  format: 'date-time',
-                },
-                deletedAt: {
-                  type: 'string',
-                  format: 'date-time',
-                },
-                name: {
-                  type: 'string',
-                },
-                teamId: {
-                  type: 'string',
-                },
-                url: {
-                  type: 'string',
-                },
-                slug: {
-                  type: 'string',
-                },
-              },
-              required: [
-                'id',
-                'userId',
-                'createdAt',
-                'updatedAt',
-                'deletedAt',
-                'name',
-                'teamId',
-                'url',
-                'slug',
               ],
             },
           },
@@ -161,7 +539,8 @@ const operation3 = defineOperation({
   auth: 'bearer',
   operation: {
     operationId: 'updateLink',
-    summary: 'Create or update links link id',
+    summary: 'Update a tracked link',
+    description: "Updates a tracked link's name, destination URL, or slug.",
     tags: ['Links'],
     parameters: [
       {
@@ -171,6 +550,7 @@ const operation3 = defineOperation({
         schema: {
           type: 'string',
         },
+        description: 'ID of the tracked link.',
       },
     ],
     requestBody: {
@@ -183,15 +563,26 @@ const operation3 = defineOperation({
               name: {
                 type: 'string',
                 maxLength: 100,
+                description: 'Display name of the resource.',
               },
               url: {
                 type: 'string',
                 maxLength: 500,
+                description: 'URL associated with the resource.',
               },
               slug: {
                 type: 'string',
-                minLength: 8,
-                maxLength: 100,
+                description: 'URL slug used to access the resource.',
+              },
+              isDefaultDomainEnabled: {
+                type: 'boolean',
+              },
+              domains: {
+                type: 'array',
+                items: {
+                  type: 'string',
+                },
+                maxItems: 20,
               },
             },
           },
@@ -200,55 +591,11 @@ const operation3 = defineOperation({
     },
     responses: {
       '200': {
-        description: 'The operation completed successfully.',
+        description:
+          'Successful response. The response shape is inferred as free-form because the handler does not expose a reusable response schema.',
         content: {
           'application/json': {
-            schema: {
-              type: 'object',
-              properties: {
-                id: {
-                  type: 'string',
-                },
-                userId: {
-                  type: 'string',
-                },
-                createdAt: {
-                  type: 'string',
-                  format: 'date-time',
-                },
-                updatedAt: {
-                  type: 'string',
-                  format: 'date-time',
-                },
-                deletedAt: {
-                  type: 'string',
-                  format: 'date-time',
-                },
-                name: {
-                  type: 'string',
-                },
-                teamId: {
-                  type: 'string',
-                },
-                url: {
-                  type: 'string',
-                },
-                slug: {
-                  type: 'string',
-                },
-              },
-              required: [
-                'id',
-                'userId',
-                'createdAt',
-                'updatedAt',
-                'deletedAt',
-                'name',
-                'teamId',
-                'url',
-                'slug',
-              ],
-            },
+            schema: {},
           },
         },
       },

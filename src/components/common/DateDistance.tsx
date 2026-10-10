@@ -1,9 +1,17 @@
 import { Text } from '@umami/react-zen';
-import { formatDistanceToNow } from 'date-fns';
+import { formatDistanceStrict, formatDistanceToNow } from 'date-fns';
 import { useLocale, useTimezone } from '@/components/hooks';
 import { isInvalidDate } from '@/lib/date';
 
-export function DateDistance({ date }: { date: Date }) {
+export function DateDistance({
+  date,
+  addSuffix = true,
+  strict = false,
+}: {
+  date: Date;
+  addSuffix?: boolean;
+  strict?: boolean;
+}) {
   const { formatTimezoneDate } = useTimezone();
   const { dateLocale } = useLocale();
 
@@ -13,7 +21,9 @@ export function DateDistance({ date }: { date: Date }) {
 
   return (
     <Text title={formatTimezoneDate(date?.toISOString(), 'PPPpp')}>
-      {formatDistanceToNow(date, { addSuffix: true, locale: dateLocale })}
+      {strict
+        ? formatDistanceStrict(date, new Date(), { locale: dateLocale })
+        : formatDistanceToNow(date, { addSuffix, locale: dateLocale })}
     </Text>
   );
 }

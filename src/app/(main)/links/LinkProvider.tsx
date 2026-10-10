@@ -2,9 +2,9 @@
 import { Loading } from '@umami/react-zen';
 import { createContext, type ReactNode } from 'react';
 import { useLinkQuery } from '@/components/hooks/queries/useLinkQuery';
-import type { Link } from '@/generated/prisma/client';
+import type { LinkWithDomains } from '@/queries/prisma';
 
-export const LinkContext = createContext<Link>(null);
+export const LinkContext = createContext<LinkWithDomains>(null);
 
 export function LinkProvider({ linkId, children }: { linkId?: string; children: ReactNode }) {
   const { data: link, isLoading, isFetching } = useLinkQuery(linkId);

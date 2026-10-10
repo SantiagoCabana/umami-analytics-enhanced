@@ -491,6 +491,9 @@ const operation2 = defineOperation({
                         type: 'string',
                         description: 'URL slug used to access the resource.',
                       },
+                      isDefaultDomainEnabled: {
+                        type: 'boolean',
+                      },
                     },
                     required: [
                       'id',
@@ -502,6 +505,7 @@ const operation2 = defineOperation({
                       'teamId',
                       'url',
                       'slug',
+                      'isDefaultDomainEnabled',
                     ],
                   },
                   description: 'Tracked links associated with the user.',

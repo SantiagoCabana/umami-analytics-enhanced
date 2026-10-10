@@ -8,6 +8,7 @@ export * from './segment';
 export * from './session';
 export * from './sessionReplay';
 export * from './share';
+export * from './shortDomain';
 export * from './team';
 export * from './teamUser';
 export * from './user';

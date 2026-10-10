@@ -142,6 +142,43 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/admin/link-domains': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get admin link domains */
+    get: operations['getAdminLinkDomains'];
+    put?: never;
+    /** Create or update admin link domains */
+    post: operations['postAdminLinkDomains'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/admin/link-domains/{domainId}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** Replace admin link domains domain id */
+    put: operations['putAdminLinkDomainsDomainId'];
+    /** Create or update admin link domains domain id */
+    post: operations['postAdminLinkDomainsDomainId'];
+    /** Delete admin link domains domain id */
+    delete: operations['deleteAdminLinkDomainsDomainId'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/admin/teams': {
     parameters: {
       query?: never;
@@ -4104,6 +4141,444 @@ export interface operations {
       };
     };
   };
+  getAdminLinkDomains: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description The operation completed successfully. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': ({
+            _count: {
+              /** @description Tracked links associated with the user. */
+              links: number;
+            };
+          } & {
+            /**
+             * Format: date-time
+             * @description Date and time the record was created.
+             */
+            createdAt: string;
+            /** @description Hostname on which the activity occurred. */
+            hostname: string;
+            /** @description Unique identifier of the resource. */
+            id: string;
+            rootRedirectUrl: string;
+            /**
+             * Format: date-time
+             * @description Date and time the record was last updated.
+             */
+            updatedAt: string;
+            /** Format: date-time */
+            verifiedAt: string;
+          })[];
+        };
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "error": {
+           *         "code": "unauthorized",
+           *         "message": "Unauthorized.",
+           *         "status": 401
+           *       }
+           *     }
+           */
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
+    };
+  };
+  postAdminLinkDomains: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description The operation completed successfully. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            _count: {
+              /** @description Tracked links associated with the user. */
+              links: number;
+            };
+          } & {
+            /**
+             * Format: date-time
+             * @description Date and time the record was created.
+             */
+            createdAt: string;
+            /** @description Hostname on which the activity occurred. */
+            hostname: string;
+            /** @description Unique identifier of the resource. */
+            id: string;
+            rootRedirectUrl: string;
+            /**
+             * Format: date-time
+             * @description Date and time the record was last updated.
+             */
+            updatedAt: string;
+            /** Format: date-time */
+            verifiedAt: string;
+          };
+        };
+      };
+      /** @description Bad request. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "error": {
+           *         "code": "bad-request",
+           *         "message": "Bad request.",
+           *         "status": 400
+           *       }
+           *     }
+           */
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "error": {
+           *         "code": "unauthorized",
+           *         "message": "Unauthorized.",
+           *         "status": 401
+           *       }
+           *     }
+           */
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
+      /** @description Server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "error": {
+           *         "code": "server-error",
+           *         "message": "Server error.",
+           *         "status": 500
+           *       }
+           *     }
+           */
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
+    };
+  };
+  putAdminLinkDomainsDomainId: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        domainId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description The operation completed successfully. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            _count: {
+              /** @description Tracked links associated with the user. */
+              links: number;
+            };
+          } & {
+            /**
+             * Format: date-time
+             * @description Date and time the record was created.
+             */
+            createdAt: string;
+            /** @description Hostname on which the activity occurred. */
+            hostname: string;
+            /** @description Unique identifier of the resource. */
+            id: string;
+            rootRedirectUrl: string;
+            /**
+             * Format: date-time
+             * @description Date and time the record was last updated.
+             */
+            updatedAt: string;
+            /** Format: date-time */
+            verifiedAt: string;
+          };
+        };
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "error": {
+           *         "code": "unauthorized",
+           *         "message": "Unauthorized.",
+           *         "status": 401
+           *       }
+           *     }
+           */
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
+      /** @description Not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "error": {
+           *         "code": "not-found",
+           *         "message": "Not found.",
+           *         "status": 404
+           *       }
+           *     }
+           */
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
+    };
+  };
+  postAdminLinkDomainsDomainId: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        domainId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description The operation completed successfully. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            _count: {
+              /** @description Tracked links associated with the user. */
+              links: number;
+            };
+          } & {
+            /**
+             * Format: date-time
+             * @description Date and time the record was created.
+             */
+            createdAt: string;
+            /** @description Hostname on which the activity occurred. */
+            hostname: string;
+            /** @description Unique identifier of the resource. */
+            id: string;
+            rootRedirectUrl: string;
+            /**
+             * Format: date-time
+             * @description Date and time the record was last updated.
+             */
+            updatedAt: string;
+            /** Format: date-time */
+            verifiedAt: string;
+          };
+        };
+      };
+      /** @description Bad request. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "error": {
+           *         "code": "bad-request",
+           *         "message": "Bad request.",
+           *         "status": 400
+           *       }
+           *     }
+           */
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "error": {
+           *         "code": "unauthorized",
+           *         "message": "Unauthorized.",
+           *         "status": 401
+           *       }
+           *     }
+           */
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
+      /** @description Not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "error": {
+           *         "code": "not-found",
+           *         "message": "Not found.",
+           *         "status": 404
+           *       }
+           *     }
+           */
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
+      /** @description Server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "error": {
+           *         "code": "server-error",
+           *         "message": "Server error.",
+           *         "status": 500
+           *       }
+           *     }
+           */
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
+    };
+  };
+  deleteAdminLinkDomainsDomainId: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        domainId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description The operation completed successfully. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /**
+             * @description Whether the operation succeeded.
+             * @constant
+             */
+            ok: true;
+          };
+        };
+      };
+      /** @description Bad request. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "error": {
+           *         "code": "bad-request",
+           *         "message": "Bad request.",
+           *         "status": 400
+           *       }
+           *     }
+           */
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "error": {
+           *         "code": "unauthorized",
+           *         "message": "Unauthorized.",
+           *         "status": 401
+           *       }
+           *     }
+           */
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
+      /** @description Not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "error": {
+           *         "code": "not-found",
+           *         "message": "Not found.",
+           *         "status": 404
+           *       }
+           *     }
+           */
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
+    };
+  };
   getAdminTeams: {
     parameters: {
       query?: {
@@ -6134,9 +6609,10 @@ export interface operations {
         };
         content: {
           'application/json': {
+            baseDomain: string;
             cloudMode: boolean;
             faviconUrl: string;
-            linksUrl: string;
+            linkDomains: string[];
             pixelsUrl: string;
             privateMode: boolean;
             sessionDeletionEnabled: boolean;
@@ -6144,6 +6620,24 @@ export interface operations {
             trackerScriptName: string;
             updatesDisabled: boolean;
           };
+        };
+      };
+      /** @description Server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "error": {
+           *         "code": "server-error",
+           *         "message": "Server error.",
+           *         "status": 500
+           *       }
+           *     }
+           */
+          'application/json': components['schemas']['ApiError'];
         };
       };
     };
@@ -6394,7 +6888,39 @@ export interface operations {
             /** @description Number of matching records. */
             count: number;
             /** @description Data returned by the operation. */
-            data: {
+            data: ({
+              domains: ({
+                /** @description Domain name associated with the resource. */
+                domain: {
+                  /**
+                   * Format: date-time
+                   * @description Date and time the record was created.
+                   */
+                  createdAt: string;
+                  /** @description Hostname on which the activity occurred. */
+                  hostname: string;
+                  /** @description Unique identifier of the resource. */
+                  id: string;
+                  rootRedirectUrl: string;
+                  /**
+                   * Format: date-time
+                   * @description Date and time the record was last updated.
+                   */
+                  updatedAt: string;
+                  /** Format: date-time */
+                  verifiedAt: string;
+                };
+              } & {
+                /**
+                 * Format: date-time
+                 * @description Date and time the record was created.
+                 */
+                createdAt: string;
+                domainId: string;
+                /** @description ID of the tracked link. */
+                linkId: string;
+              })[];
+            } & {
               /**
                * Format: date-time
                * @description Date and time the record was created.
@@ -6407,6 +6933,7 @@ export interface operations {
               deletedAt: string;
               /** @description Unique identifier of the resource. */
               id: string;
+              isDefaultDomainEnabled: boolean;
               /** @description Display name of the resource. */
               name: string;
               /** @description URL slug used to access the resource. */
@@ -6422,7 +6949,7 @@ export interface operations {
               url: string;
               /** @description ID of the associated user. */
               userId: string;
-            }[];
+            })[];
             /** @description Whether the results were truncated by the maximum result limit. */
             isCapped?: boolean;
             /** @description Field to sort the results by. */
@@ -6486,8 +7013,10 @@ export interface operations {
     requestBody: {
       content: {
         'application/json': {
+          domains?: string[];
           /** @description Unique identifier of the resource. */
           id?: string | null;
+          isDefaultDomainEnabled?: boolean;
           /** @description Display name of the resource. */
           name: string;
           /** @description URL slug used to access the resource. */
@@ -6507,6 +7036,38 @@ export interface operations {
         };
         content: {
           'application/json': {
+            domains: ({
+              /** @description Domain name associated with the resource. */
+              domain: {
+                /**
+                 * Format: date-time
+                 * @description Date and time the record was created.
+                 */
+                createdAt: string;
+                /** @description Hostname on which the activity occurred. */
+                hostname: string;
+                /** @description Unique identifier of the resource. */
+                id: string;
+                rootRedirectUrl: string;
+                /**
+                 * Format: date-time
+                 * @description Date and time the record was last updated.
+                 */
+                updatedAt: string;
+                /** Format: date-time */
+                verifiedAt: string;
+              };
+            } & {
+              /**
+               * Format: date-time
+               * @description Date and time the record was created.
+               */
+              createdAt: string;
+              domainId: string;
+              /** @description ID of the tracked link. */
+              linkId: string;
+            })[];
+          } & {
             /**
              * Format: date-time
              * @description Date and time the record was created.
@@ -6519,6 +7080,7 @@ export interface operations {
             deletedAt: string;
             /** @description Unique identifier of the resource. */
             id: string;
+            isDefaultDomainEnabled: boolean;
             /** @description Display name of the resource. */
             name: string;
             /** @description URL slug used to access the resource. */
@@ -6573,6 +7135,24 @@ export interface operations {
           'application/json': components['schemas']['ApiError'];
         };
       };
+      /** @description Server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "error": {
+           *         "code": "server-error",
+           *         "message": "Server error.",
+           *         "status": 500
+           *       }
+           *     }
+           */
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
     };
   };
   getLink: {
@@ -6594,6 +7174,182 @@ export interface operations {
         };
         content: {
           'application/json': {
+            _count: {
+              domains: number;
+              /** @description Team associated with the resource. */
+              team: number;
+              /** @description User associated with the resource. */
+              user: number;
+            };
+            /**
+             * Format: date-time
+             * @description Date and time the record was created.
+             */
+            createdAt: string;
+            /**
+             * Format: date-time
+             * @description Date and time the record was deleted, if applicable.
+             */
+            deletedAt: string;
+            domains: (
+              | {
+                  /**
+                   * Format: date-time
+                   * @description Date and time the record was created.
+                   */
+                  createdAt: string;
+                  domainId: string;
+                  /** @description ID of the tracked link. */
+                  linkId: string;
+                }
+              | ({
+                  /**
+                   * Format: date-time
+                   * @description Date and time the record was created.
+                   */
+                  createdAt: string;
+                  /** @description Domain name associated with the resource. */
+                  domain: {
+                    /**
+                     * Format: date-time
+                     * @description Date and time the record was created.
+                     */
+                    createdAt: string;
+                    /** @description Hostname on which the activity occurred. */
+                    hostname: string;
+                    /** @description Unique identifier of the resource. */
+                    id: string;
+                    rootRedirectUrl: string;
+                    /**
+                     * Format: date-time
+                     * @description Date and time the record was last updated.
+                     */
+                    updatedAt: string;
+                    /** Format: date-time */
+                    verifiedAt: string;
+                  };
+                  domainId: string;
+                  link: {
+                    /**
+                     * Format: date-time
+                     * @description Date and time the record was created.
+                     */
+                    createdAt: string;
+                    /**
+                     * Format: date-time
+                     * @description Date and time the record was deleted, if applicable.
+                     */
+                    deletedAt: string;
+                    /** @description Unique identifier of the resource. */
+                    id: string;
+                    isDefaultDomainEnabled: boolean;
+                    /** @description Display name of the resource. */
+                    name: string;
+                    /** @description URL slug used to access the resource. */
+                    slug: string;
+                    /** @description ID of the associated team. */
+                    teamId: string;
+                    /**
+                     * Format: date-time
+                     * @description Date and time the record was last updated.
+                     */
+                    updatedAt: string;
+                    /** @description URL associated with the resource. */
+                    url: string;
+                    /** @description ID of the associated user. */
+                    userId: string;
+                  };
+                  /** @description ID of the tracked link. */
+                  linkId: string;
+                } & {
+                  /**
+                   * Format: date-time
+                   * @description Date and time the record was created.
+                   */
+                  createdAt: string;
+                  domainId: string;
+                  /** @description ID of the tracked link. */
+                  linkId: string;
+                })
+            )[];
+            /** @description Unique identifier of the resource. */
+            id: string;
+            isDefaultDomainEnabled: boolean;
+            /** @description Display name of the resource. */
+            name: string;
+            /** @description URL slug used to access the resource. */
+            slug: string;
+            /** @description Team associated with the resource. */
+            team: {
+              /** @description Code used to join the team. */
+              accessCode: string;
+              /**
+               * Format: date-time
+               * @description Date and time the record was created.
+               */
+              createdAt: string;
+              /**
+               * Format: date-time
+               * @description Date and time the record was deleted, if applicable.
+               */
+              deletedAt: string;
+              /** @description Unique identifier of the resource. */
+              id: string;
+              /** @description URL of the logo image. */
+              logoUrl: string;
+              /** @description Display name of the resource. */
+              name: string;
+              /** @description Whether two-factor authentication is required. */
+              twoFactorRequired: boolean;
+              /**
+               * Format: date-time
+               * @description Date and time the record was last updated.
+               */
+              updatedAt: string;
+            };
+            /** @description ID of the associated team. */
+            teamId: string;
+            /**
+             * Format: date-time
+             * @description Date and time the record was last updated.
+             */
+            updatedAt: string;
+            /** @description URL associated with the resource. */
+            url: string;
+            /** @description User associated with the resource. */
+            user: {
+              /**
+               * Format: date-time
+               * @description Date and time the record was created.
+               */
+              createdAt: string;
+              /**
+               * Format: date-time
+               * @description Date and time the record was deleted, if applicable.
+               */
+              deletedAt: string;
+              displayName: string;
+              /** @description Unique identifier of the resource. */
+              id: string;
+              /** @description URL of the logo image. */
+              logoUrl: string;
+              /** @description Password used to authenticate the account. */
+              password: string;
+              /** @description Permission role assigned to the user. */
+              role: string;
+              /** @description Whether two-factor authentication is required. */
+              twoFactorRequired: boolean;
+              /**
+               * Format: date-time
+               * @description Date and time the record was last updated.
+               */
+              updatedAt: string;
+              /** @description Username of the account. */
+              username: string;
+            };
+            /** @description ID of the associated user. */
+            userId: string;
+          } & {
             /**
              * Format: date-time
              * @description Date and time the record was created.
@@ -6606,6 +7362,7 @@ export interface operations {
             deletedAt: string;
             /** @description Unique identifier of the resource. */
             id: string;
+            isDefaultDomainEnabled: boolean;
             /** @description Display name of the resource. */
             name: string;
             /** @description URL slug used to access the resource. */
@@ -6657,6 +7414,8 @@ export interface operations {
     requestBody: {
       content: {
         'application/json': {
+          domains?: string[];
+          isDefaultDomainEnabled?: boolean;
           /** @description Display name of the resource. */
           name?: string;
           /** @description URL slug used to access the resource. */
@@ -6667,41 +7426,13 @@ export interface operations {
       };
     };
     responses: {
-      /** @description The operation completed successfully. */
+      /** @description Successful response. The response shape is inferred as free-form because the handler does not expose a reusable response schema. */
       200: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          'application/json': {
-            /**
-             * Format: date-time
-             * @description Date and time the record was created.
-             */
-            createdAt: string;
-            /**
-             * Format: date-time
-             * @description Date and time the record was deleted, if applicable.
-             */
-            deletedAt: string;
-            /** @description Unique identifier of the resource. */
-            id: string;
-            /** @description Display name of the resource. */
-            name: string;
-            /** @description URL slug used to access the resource. */
-            slug: string;
-            /** @description ID of the associated team. */
-            teamId: string;
-            /**
-             * Format: date-time
-             * @description Date and time the record was last updated.
-             */
-            updatedAt: string;
-            /** @description URL associated with the resource. */
-            url: string;
-            /** @description ID of the associated user. */
-            userId: string;
-          };
+          'application/json': unknown;
         };
       };
       /** @description Bad request. */
@@ -10149,7 +10880,39 @@ export interface operations {
             /** @description Number of matching records. */
             count: number;
             /** @description Data returned by the operation. */
-            data: {
+            data: ({
+              domains: ({
+                /** @description Domain name associated with the resource. */
+                domain: {
+                  /**
+                   * Format: date-time
+                   * @description Date and time the record was created.
+                   */
+                  createdAt: string;
+                  /** @description Hostname on which the activity occurred. */
+                  hostname: string;
+                  /** @description Unique identifier of the resource. */
+                  id: string;
+                  rootRedirectUrl: string;
+                  /**
+                   * Format: date-time
+                   * @description Date and time the record was last updated.
+                   */
+                  updatedAt: string;
+                  /** Format: date-time */
+                  verifiedAt: string;
+                };
+              } & {
+                /**
+                 * Format: date-time
+                 * @description Date and time the record was created.
+                 */
+                createdAt: string;
+                domainId: string;
+                /** @description ID of the tracked link. */
+                linkId: string;
+              })[];
+            } & {
               /**
                * Format: date-time
                * @description Date and time the record was created.
@@ -10162,6 +10925,7 @@ export interface operations {
               deletedAt: string;
               /** @description Unique identifier of the resource. */
               id: string;
+              isDefaultDomainEnabled: boolean;
               /** @description Display name of the resource. */
               name: string;
               /** @description URL slug used to access the resource. */
@@ -10177,7 +10941,7 @@ export interface operations {
               url: string;
               /** @description ID of the associated user. */
               userId: string;
-            }[];
+            })[];
             /** @description Whether the results were truncated by the maximum result limit. */
             isCapped?: boolean;
             /** @description Field to sort the results by. */
@@ -11307,6 +12071,7 @@ export interface operations {
               deletedAt: string;
               /** @description Unique identifier of the resource. */
               id: string;
+              isDefaultDomainEnabled: boolean;
               /** @description Display name of the resource. */
               name: string;
               /** @description URL slug used to access the resource. */
@@ -19796,7 +20561,20 @@ export interface operations {
           name: string;
           /** @description Configuration parameters for the resource. */
           parameters: {
-            [key: string]: unknown;
+            action?: {
+              type: string;
+              value: string;
+            };
+            dateRange?: string;
+            /** @description Filters applied to the analytics data. */
+            filters?: {
+              [key: string]: unknown;
+            }[];
+            /**
+             * @description Whether records must match all filters or any filter.
+             * @enum {string}
+             */
+            match?: 'all' | 'any';
           };
           /** @enum {string} */
           type: 'segment' | 'cohort';
@@ -21276,6 +22054,7 @@ export interface operations {
         content: {
           'application/json': {
             canDelete: unknown;
+            distinctIds: unknown;
             stitchedSessionCount: unknown;
           };
         };

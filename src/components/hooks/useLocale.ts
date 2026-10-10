@@ -11,6 +11,23 @@ const messages = {
   'en-US': enUS,
 };
 
+function mergeMessages(
+  defaults: Record<string, unknown>,
+  translations: Record<string, unknown>,
+): Record<string, unknown> {
+  return Object.fromEntries(
+    Array.from(new Set([...Object.keys(defaults), ...Object.keys(translations)])).map(key => [
+      key,
+      defaults[key] && translations[key] && typeof defaults[key] === 'object'
+        ? mergeMessages(
+            defaults[key] as Record<string, unknown>,
+            translations[key] as Record<string, unknown>,
+          )
+        : (translations[key] ?? defaults[key]),
+    ]),
+  );
+}
+
 const selector = (state: { locale: string }) => state.locale;
 
 export function useLocale() {
@@ -22,7 +39,7 @@ export function useLocale() {
   async function loadMessages(locale: string) {
     const { data } = await httpGet(`${process.env.basePath || ''}/intl/messages/${locale}.json`);
 
-    messages[locale] = data;
+    messages[locale] = mergeMessages(enUS, data);
   }
 
   async function saveLocale(value: string) {

@@ -13,7 +13,11 @@ export interface LinksTableProps extends DataTableProps {
   showActions?: boolean;
 }
 
-export function LinksTable({ showActions, data = [], ...props }: LinksTableProps & { data?: any[] }) {
+export function LinksTable({
+  showActions,
+  data = [],
+  ...props
+}: LinksTableProps & { data?: any[] }) {
   const { t, labels } = useMessages();
   const { websiteId, renderUrl } = useNavigation();
   const { getSlugUrl } = useSlug('link');
@@ -24,7 +28,11 @@ export function LinksTable({ showActions, data = [], ...props }: LinksTableProps
 
   return (
     <DataTable {...props} data={data}>
-      <DataColumn id="name" label={<SortableLabel label={t(labels.name)} sortKey="name" />}>
+      <DataColumn
+        id="name"
+        label={<SortableLabel label={t(labels.name)} sortKey="name" />}
+        width="1fr"
+      >
         {({ id, name }: any) => {
           return <Link href={renderUrl(`/links/${id}`)}>{name}</Link>;
         }}
@@ -32,16 +40,27 @@ export function LinksTable({ showActions, data = [], ...props }: LinksTableProps
       <DataColumn
         id="slug"
         label={<SortableLabel label={t(labels.link)} sortKey="slug" />}
+        width="2fr"
         style={{ minWidth: 0 }}
       >
-        {({ slug }: any) => {
-          const url = getSlugUrl(slug);
-          return <ExternalLink href={url}>{url}</ExternalLink>;
+        {({ slug, domains, isDefaultDomainEnabled }: any) => {
+          const url = domains?.[0]?.domain?.hostname
+            ? `https://${domains[0].domain.hostname}/q/${slug}`
+            : isDefaultDomainEnabled
+              ? getSlugUrl(slug)
+              : null;
+
+          return url ? (
+            <ExternalLink href={url}>{url}</ExternalLink>
+          ) : (
+            <span>{t(labels.unassigned)}</span>
+          );
         }}
       </DataColumn>
       <DataColumn
         id="url"
         label={<SortableLabel label={t(labels.destinationUrl)} sortKey="url" />}
+        width="1.5fr"
         style={{ minWidth: 0 }}
       >
         {({ url }: any) => {
@@ -51,6 +70,7 @@ export function LinksTable({ showActions, data = [], ...props }: LinksTableProps
       <DataColumn
         id="chart"
         label={<span style={{ whiteSpace: 'normal' }}>{`${t(labels.visitors)} (7d)`}</span>}
+        width="140px"
         style={{ minWidth: 0 }}
       >
         {(row: any) => {
@@ -70,9 +90,20 @@ export function LinksTable({ showActions, data = [], ...props }: LinksTableProps
         label={
           <SortableLabel label={t(labels.created)} sortKey="createdAt" defaultDirection="desc" />
         }
-        width="180px"
+        width="150px"
       >
-        {(row: any) => <DateDistance date={new Date(row.createdAt)} />}
+        {(row: any) => <DateDistance date={new Date(row.createdAt)} strict />}
+      </DataColumn>
+      <DataColumn
+        id="updated"
+        label={
+          <SortableLabel label={t(labels.updated)} sortKey="updatedAt" defaultDirection="desc" />
+        }
+        width="150px"
+      >
+        {(row: any) =>
+          row.updatedAt ? <DateDistance date={new Date(row.updatedAt)} strict /> : <span>-</span>
+        }
       </DataColumn>
       {showActions && (
         <DataColumn id="action" align="end" width="72px">

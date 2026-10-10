@@ -3,9 +3,10 @@ import { useApi } from '@/components/hooks/useApi';
 import { setConfig, useApp } from '@/store/app';
 
 export type Config = {
+  baseDomain?: string;
   cloudMode: boolean;
   faviconUrl?: string;
-  linksUrl?: string;
+  linkDomains: string[];
   pixelsUrl?: string;
   privateMode: boolean;
   sessionDeletionEnabled: boolean;
@@ -26,7 +27,9 @@ export function useConfig(): Config {
 
   useEffect(() => {
     if (!config) {
-      loadConfig();
+      loadConfig().catch(error => {
+        console.warn('Unable to load application configuration.', error);
+      });
     }
   }, []);
 

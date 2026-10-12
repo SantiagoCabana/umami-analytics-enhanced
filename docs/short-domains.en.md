@@ -9,16 +9,16 @@ Custom short domains publish the same shortened links from additional hosts with
 ## Data model
 
 - `short_domain` stores a unique hostname, its required root redirect URL, and timestamps.
-- `link_domain` associates each link with the short domains on which it can resolve.
-- A `slug` is globally unique. The same slug can be published on the primary domain and on several assigned short domains.
-- `link.is_default_domain_enabled` controls whether the link is also published on the primary domain.
+- `link_domain` lets an exceptional link be published only on specific short domains.
+- A `slug` is globally unique.
+- `link.is_default_domain_enabled` publishes the link on the primary domain and on **every** registered short domain.
 
 A link resolves only when it is published on the requested host:
 
 | State | Result |
 | --- | --- |
-| Primary domain enabled | `https://<BASE_DOMAIN>/q/<slug>` works. |
-| Assigned short domain | `https://<short-domain>/q/<slug>` works. |
+| Default domain enabled | `https://<BASE_DOMAIN>/q/<slug>` and `https://<registered-short-domain>/q/<slug>` work. |
+| Assigned short domain | A link with the default domain disabled works only on its assigned short domain. |
 | Unassigned host, unknown slug, or deleted link | `404` response. |
 | Neither primary nor short domain assigned | The link is inactive and returns `404`. |
 

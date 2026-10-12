@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import { POST } from '@/app/api/send/route';
 import { getLinkDomainVerificationHostname } from '@/lib/link-domain-verification';
-import { getLinkCacheKey, getRequestLinkDomain } from '@/lib/link-domains';
+import { getBaseDomain, getLinkCacheKey, getRequestLinkDomain } from '@/lib/link-domains';
 import {
   getLinkVariableNames,
   isValidLinkDestinationUrl,
@@ -34,25 +34,32 @@ export async function GET(request: Request, { params }: { params: Promise<{ slug
   }
 
   const domain = hostname ? await findShortDomainByHostname(hostname) : null;
+  const baseDomain = getBaseDomain();
 
-  const cacheKey = domain ? getLinkCacheKey(domain.hostname, slug) : `link:${slug}`;
-  const queryLink = () =>
-    domain ? findLinkByDomain(slug, domain.id) : findLinkByDefaultDomain(slug);
+  if (baseDomain && hostname && hostname !== baseDomain && !domain) {
+    return notFound();
+  }
 
-  let link;
+  // Links enabled on the default domain are published on every registered
+  // additional host as well. Domain-specific assignments remain available for
+  // legacy links that are intentionally disabled on the default domain.
+  const getDefaultLink = () => findLinkByDefaultDomain(slug);
+  const defaultCacheKey = `link:${slug}`;
+  let link = redis.enabled
+    ? await redis.client.fetch(defaultCacheKey, getDefaultLink, 86400)
+    : await getDefaultLink();
 
-  if (redis.enabled) {
-    link = await redis.client.fetch(cacheKey, queryLink, 86400);
+  if (!link && domain) {
+    const getDomainLink = () => findLinkByDomain(slug, domain.id);
+    const domainCacheKey = getLinkCacheKey(domain.hostname, slug);
 
-    if (!link) {
-      return notFound();
-    }
-  } else {
-    link = await queryLink();
+    link = redis.enabled
+      ? await redis.client.fetch(domainCacheKey, getDomainLink, 86400)
+      : await getDomainLink();
+  }
 
-    if (!link) {
-      return notFound();
-    }
+  if (!link) {
+    return notFound();
   }
 
   const payload = {

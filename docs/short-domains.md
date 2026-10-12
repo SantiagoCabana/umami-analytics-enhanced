@@ -9,16 +9,16 @@ Los dominios cortos permiten publicar los mismos enlaces desde hosts adicionales
 ## Modelo
 
 - `short_domain` almacena un hostname único, su URL de redirección raíz y sus marcas de tiempo.
-- `link_domain` relaciona cada enlace con los dominios cortos donde puede resolverse.
-- Un `slug` es globalmente único. El mismo slug puede publicarse en el dominio principal y en varios dominios cortos asignados.
-- `link.is_default_domain_enabled` controla si el enlace también está publicado en el dominio principal.
+- `link_domain` permite publicar excepcionalmente un enlace solo en dominios cortos concretos.
+- Un `slug` es globalmente único.
+- `link.is_default_domain_enabled` publica el enlace en el dominio principal y en **todos** los dominios cortos registrados.
 
 Un enlace se resuelve únicamente si está publicado en el host solicitado:
 
 | Estado | Resultado |
 | --- | --- |
-| Dominio principal activado | `https://<BASE_DOMAIN>/q/<slug>` funciona. |
-| Dominio corto asignado | `https://<dominio-corto>/q/<slug>` funciona. |
+| Dominio predeterminado activado | `https://<BASE_DOMAIN>/q/<slug>` y `https://<dominio-corto-registrado>/q/<slug>` funcionan. |
+| Dominio corto asignado | Un enlace con el dominio predeterminado desactivado funciona solo en el dominio corto asignado. |
 | Host no asignado, slug inexistente o enlace eliminado | Respuesta `404`. |
 | Sin dominio principal ni dominio corto asignado | El enlace está inactivo y responde `404`. |
 

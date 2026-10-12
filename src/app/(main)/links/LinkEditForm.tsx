@@ -50,6 +50,7 @@ export function LinkEditForm({
   const defaultDomain = baseDomain || globalThis?.location?.hostname || t(labels.defaultDomain);
   const defaultDomainLabel = `https://${defaultDomain}`;
   const hostUrl = baseDomain ? `${defaultDomainLabel}/q` : `${globalThis?.location?.origin}/q`;
+  const defaultDomainUrls = [hostUrl, ...linkDomains.map(domain => `https://${domain}/q`)];
   const { data, isLoading } = useLinkQuery(linkId);
   const linkData = data && {
     ...data,
@@ -188,19 +189,21 @@ export function LinkEditForm({
             <Column gap="1">
               <Label>{t(labels.link)}</Label>
               {[
-                ...(isDefaultDomainEnabled ? [hostUrl] : []),
+                ...(isDefaultDomainEnabled ? defaultDomainUrls : []),
                 ...customDomains.map((domain: string) => `https://${domain}/q`),
-              ].map(baseUrl => (
-                <Row key={baseUrl} alignItems="center" gap>
-                  <TextField
-                    value={`${baseUrl}/${slug}`}
-                    autoComplete="off"
-                    isReadOnly
-                    allowCopy
-                    style={{ width: '100%' }}
-                  />
-                </Row>
-              ))}
+              ]
+                .filter((baseUrl, index, urls) => urls.indexOf(baseUrl) === index)
+                .map(baseUrl => (
+                  <Row key={baseUrl} alignItems="center" gap>
+                    <TextField
+                      value={`${baseUrl}/${slug}`}
+                      autoComplete="off"
+                      isReadOnly
+                      allowCopy
+                      style={{ width: '100%' }}
+                    />
+                  </Row>
+                ))}
               {!isDefaultDomainEnabled && customDomains.length === 0 && (
                 <p className="text-sm text-muted">{t(labels.linkDisabled)}</p>
               )}

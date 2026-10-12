@@ -340,7 +340,7 @@ model Revenue {
 model Link {
   id                     String    @id() @map("link_id") @db.Uuid
   name                   String    @db.VarChar(100)
-  url                    String    @db.VarChar(500)
+  url                    String    @db.VarChar(2000)
   slug                   String    @unique() @db.VarChar(100)
   isDefaultDomainEnabled Boolean   @default(true) @map("is_default_domain_enabled")
   userId                 String?   @map("user_id") @db.Uuid

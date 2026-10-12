@@ -41,7 +41,7 @@ const getLinkDomainVerificationHostnameMock = vi.mocked(getLinkDomainVerificatio
 
 const params = { params: Promise.resolve({ slug: 'abcdefgh' }) };
 const verificationParams = { params: Promise.resolve({ slug: '_umami-domain-verification' }) };
-const request = (hostname = 'app.example.com') =>
+const request = (hostname = 'url.practis.pe') =>
   new Request(`https://${hostname}/q/abcdefgh`, { headers: { host: hostname } });
 const link = { id: 'link-1', url: 'https://destination.example.com' } as any;
 const variable = (name: string) => `\${${name}}`;
@@ -55,19 +55,35 @@ beforeEach(() => {
   postMock.mockReset();
   getLinkDomainVerificationHostnameMock.mockReset();
   redis.enabled = false;
+  vi.stubEnv('BASE_DOMAIN', 'url.practis.pe');
 });
 
-test('redirects a link from an assigned custom domain', async () => {
+test('redirects a default-domain link from a registered additional domain', async () => {
   findShortDomainByHostnameMock.mockResolvedValue({
     id: 'domain-1',
     hostname: 'go.example.com',
   } as any);
+  findLinkByDefaultDomainMock.mockResolvedValue(link);
+
+  const response = await GET(request('go.example.com'), params);
+
+  expect(findLinkByDefaultDomainMock).toHaveBeenCalledWith('abcdefgh');
+  expect(findLinkByDomainMock).not.toHaveBeenCalled();
+  expect(response.headers.get('location')).toBe('https://destination.example.com/');
+});
+
+test('falls back to an explicitly assigned domain-only link', async () => {
+  findShortDomainByHostnameMock.mockResolvedValue({
+    id: 'domain-1',
+    hostname: 'go.example.com',
+  } as any);
+  findLinkByDefaultDomainMock.mockResolvedValue(null);
   findLinkByDomainMock.mockResolvedValue(link);
 
   const response = await GET(request('go.example.com'), params);
 
+  expect(findLinkByDefaultDomainMock).toHaveBeenCalledWith('abcdefgh');
   expect(findLinkByDomainMock).toHaveBeenCalledWith('abcdefgh', 'domain-1');
-  expect(findLinkByDefaultDomainMock).not.toHaveBeenCalled();
   expect(response.headers.get('location')).toBe('https://destination.example.com/');
 });
 
@@ -140,6 +156,17 @@ test('redirects a link without custom domains from the default domain', async ()
   expect(findLinkByDefaultDomainMock).toHaveBeenCalledWith('abcdefgh');
   expect(findLinkByDomainMock).not.toHaveBeenCalled();
   expect(response.headers.get('location')).toBe('https://destination.example.com/');
+});
+
+test('does not resolve a default-domain link from an unregistered host', async () => {
+  findShortDomainByHostnameMock.mockResolvedValue(null);
+  findLinkByDefaultDomainMock.mockResolvedValue(link);
+
+  const response = await GET(request('unknown.example.com'), params);
+
+  expect(response.status).toBe(404);
+  expect(findLinkByDefaultDomainMock).not.toHaveBeenCalled();
+  expect(postMock).not.toHaveBeenCalled();
 });
 
 test('does not redirect a link disabled on the default domain', async () => {

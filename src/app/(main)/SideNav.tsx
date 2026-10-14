@@ -114,7 +114,7 @@ export function SideNav(props: any) {
         ) : pathname.includes('/settings') ? (
           <SettingsNav isCollapsed={isCollapsed} />
         ) : pathname.includes('/admin') ? (
-          <AdminNav />
+          <AdminNav isCollapsed={isCollapsed} />
         ) : (
           <Column gap="2">
             {links.map(({ id, path, label, icon }) => {

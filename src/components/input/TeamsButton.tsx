@@ -16,11 +16,12 @@ import { useLoginQuery, useMessages, useMobile, useNavigation } from '@/componen
 import { ChevronRight, User, Users } from '@/components/icons';
 import { LAST_TEAM_CONFIG } from '@/lib/constants';
 import { removeItem } from '@/lib/storage';
+import { getTeamNavigationPath } from '@/lib/team-navigation';
 
 export function TeamsButton() {
   const { user } = useLoginQuery();
   const { t, labels } = useMessages();
-  const { teamId, router } = useNavigation();
+  const { pathname, teamId, router } = useNavigation();
   const { isPhone } = useMobile();
   const team = user?.teams?.find(({ id }) => id === teamId);
   const selectedKeys = new Set([teamId || 'user']);
@@ -43,11 +44,7 @@ export function TeamsButton() {
   const handleAction = async (key: Key) => {
     if (key === 'user') {
       removeItem(LAST_TEAM_CONFIG);
-      if (cloudMode) {
-        window.location.href = '/';
-      } else {
-        router.push('/');
-      }
+      handleNavigate(getUrl(getTeamNavigationPath(pathname)));
     }
   };
 
@@ -78,7 +75,11 @@ export function TeamsButton() {
         <MenuSeparator />
         <MenuSection title={t(labels.teams)}>
           {user?.teams?.map(({ id, name }) => (
-            <MenuItem key={id} id={id} onAction={() => handleNavigate(getUrl(`/teams/${id}`))}>
+            <MenuItem
+              key={id}
+              id={id}
+              onAction={() => handleNavigate(getUrl(getTeamNavigationPath(pathname, id)))}
+            >
               <IconLabel icon={<Users />}>
                 <Text wrap="nowrap">{name}</Text>
               </IconLabel>

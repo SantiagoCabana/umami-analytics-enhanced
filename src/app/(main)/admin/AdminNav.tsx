@@ -5,7 +5,13 @@ import { NavMenu } from '@/components/common/NavMenu';
 import { useMessages, useNavigation } from '@/components/hooks';
 import { ArrowLeft, Globe, ShieldCheck, User, Users } from '@/components/icons';
 
-export function AdminNav({ onItemClick }: { onItemClick?: () => void }) {
+export function AdminNav({
+  isCollapsed,
+  onItemClick,
+}: {
+  isCollapsed?: boolean;
+  onItemClick?: () => void;
+}) {
   const { t, labels } = useMessages();
   const { pathname, renderUrl } = useNavigation();
 
@@ -53,24 +59,40 @@ export function AdminNav({ onItemClick }: { onItemClick?: () => void }) {
 
   return (
     <Column gap="2">
-      <Link href={renderUrl('/websites', false)} role="button" onClick={onItemClick}>
-        <TooltipTrigger delay={0}>
-          <Row
-            tabIndex={0}
-            alignItems="center"
-            hover={{ backgroundColor: 'surface-sunken' }}
-            borderRadius
-            minHeight="9"
-          >
-            <IconLabel icon={<ArrowLeft />} label={t(labels.back)} padding />
-          </Row>
-          <Tooltip placement="right">{t(labels.back)}</Tooltip>
-        </TooltipTrigger>
+      <Link
+        href={renderUrl('/websites', false)}
+        role="button"
+        aria-label={isCollapsed ? t(labels.back) : undefined}
+        onClick={onItemClick}
+      >
+        {(() => {
+          const content = (
+            <Row
+              tabIndex={0}
+              alignItems="center"
+              justifyContent={isCollapsed ? 'center' : undefined}
+              hover={{ backgroundColor: 'surface-sunken' }}
+              borderRadius
+              minHeight="9"
+            >
+              <IconLabel icon={<ArrowLeft />} label={isCollapsed ? '' : t(labels.back)} padding />
+            </Row>
+          );
+
+          return isCollapsed ? (
+            <TooltipTrigger delay={0}>
+              {content}
+              <Tooltip placement="right">{t(labels.back)}</Tooltip>
+            </TooltipTrigger>
+          ) : (
+            content
+          );
+        })()}
       </Link>
       <NavMenu
         items={items}
         selectedKey={selectedKey}
-        allowMinimize={false}
+        isCollapsed={isCollapsed}
         onItemClick={onItemClick}
       />
     </Column>

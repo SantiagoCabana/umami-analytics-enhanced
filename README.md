@@ -1,174 +1,326 @@
 <p align="center">
-  <img src="https://content.umami.is/website/images/umami-logo.png" alt="Umami Logo" width="100">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="src/assets/logo-white.svg">
+    <img src="src/assets/logo.svg" width="100" alt="Umami">
+  </picture>
 </p>
 
-<h1 align="center">Umami</h1>
+<h1 align="center">Umami Analytics Enhanced</h1>
 
 <p align="center">
-  <strong>English</strong> | <a href="docs/README.es.md">Español</a>
+  <i>Analítica de Umami con dominios personalizados y variables para enlaces cortos.</i>
 </p>
 
 <p align="center">
-  <i>Umami is a privacy-first analytics platform. Traffic, campaigns, behavior, conversions, and revenue in one place — no cookies, no surveillance, self-hosted or in the cloud.</i>
+  <sub>Fork independiente de <a href="https://github.com/umami-software/umami">Umami</a>.</sub>
 </p>
 
 <p align="center">
-  <a href="https://github.com/umami-software/umami/releases"><img src="https://img.shields.io/github/release/umami-software/umami.svg" alt="GitHub Release" /></a>
-  <a href="https://github.com/umami-software/umami/blob/master/LICENSE"><img src="https://img.shields.io/github/license/umami-software/umami.svg" alt="MIT License" /></a>
-  <a href="https://github.com/umami-software/umami/actions"><img src="https://img.shields.io/github/actions/workflow/status/umami-software/umami/ci.yml" alt="Build Status" /></a>
-  <a href="https://cloud.umami.is/share/LGazGOecbDtaIwDr/umami.is" style="text-decoration: none;"><img src="https://img.shields.io/badge/Try%20Demo%20Now-Click%20Here-brightgreen" alt="Umami Demo" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="Licencia MIT"></a>
+  <a href="https://github.com/umami-software/umami"><img src="https://img.shields.io/badge/based%20on-Umami-black" alt="Basado en Umami"></a>
+</p>
+
+<p align="center">
+  <a href="#qué-añade-enhanced">Novedades</a> ·
+  <a href="#inicio-rápido">Instalación</a> ·
+  <a href="#soporte-y-licencia">Soporte</a> ·
+  <a href="#english">English</a>
 </p>
 
 ---
 
-## 🚀 Getting Started
+## Qué añade Enhanced
 
-A detailed getting started guide can be found at [umami.is/docs](https://umami.is/docs/).
+Umami reúne analítica de tráfico, campañas, eventos y conversiones. Esta fork conserva esa base
+y añade herramientas para administrar la publicación y los destinos de enlaces cortos.
+Las funciones generales de analítica proceden del proyecto original; las siguientes son las
+extensiones de Enhanced.
+
+### Dominios personalizados
+
+Publica un mismo enlace desde el dominio principal y desde dominios adicionales registrados.
+Con la publicación predeterminada activada, el enlace funciona en todos ellos. Para una publicación
+exclusiva, desactívala y asigna los dominios concretos. El slug sigue siendo globalmente único.
+
+<p align="center"><img src="docs/assets/link-flow-es.svg" width="760" alt="El host principal y un dominio registrado comparten un enlace predeterminado que redirige al destino."></p>
+
+Añade hosts desde **Administración → Dominios** después de configurar DNS, HTTPS y el proxy hacia
+esta instancia. Antes de guardar, la aplicación verifica DNS público, certificado TLS y enrutamiento
+con un desafío HTTPS firmado. Esta comprobación es puntual, no monitorización continua.
+
+### Redirección de raíz y rutas públicas
+
+Cada dominio corto tiene una URL de redirección raíz: al visitar `/`, el usuario llega a esa URL.
+El dominio principal mantiene el panel; los dominios cortos registrados sirven las rutas públicas
+de enlaces y recopilación, mientras que `/login`, `/admin` y las APIs privadas devuelven `404`.
+
+| Ruta pública | Función |
+| --- | --- |
+| `/q/<slug>` | Redirección del enlace corto. |
+| `/p/<slug>` | Píxel de seguimiento. |
+| `/script.js`, `/recorder.js` | Tracker y recorder. |
+| `/api/send`, `/api/batch`, `/api/record` | Recopilación de eventos y grabaciones. |
+| `/api/websites/<websiteId>/recorder` | Configuración pública del recorder. |
+
+Un enlace inexistente, eliminado o no publicado en el host solicitado devuelve `404`.
+
+### Variables de destino
+
+Define valores reutilizables en **Enlaces → Variables** y referencia sus nombres con `${nombre}`.
+Se resuelven en cada clic: cambiar el valor actualiza los destinos que lo utilizan sin editar cada
+enlace. Los destinos admiten hasta 2.000 caracteres.
+
+Ejemplo de un destino reutilizable:
+
+```text
+destino = https://example.com/contacto
+
+${destino}?utm_campaign=verano
+→ https://example.com/contacto?utm_campaign=verano
+```
+
+<p align="center"><img src="docs/assets/variable-flow-es.svg" width="760" alt="Define una variable, úsala en varios enlaces y actualiza su valor desde un único lugar."></p>
+
+Una variable inicial puede contener una URL completa; las variables posteriores se codifican
+para su uso dentro de la URL. Usa `?` para iniciar parámetros y `&` si la base ya tiene una consulta.
+Los nombres se normalizan a minúsculas. Una referencia no definida permanece literal y el destino
+resuelto debe ser HTTP o HTTPS.
+
+Estas funciones no implican atribución automática de una visita web a un enlace corto concreto.
+Para distinguir campañas, añade parámetros de campaña y configura la atribución que necesites.
 
 ---
 
-## 🛠 Installing from Source
+## Inicio rápido
 
-### Requirements
+La [documentación de Umami](https://umami.is/docs/) explica la analítica general.
+Para disponer de las extensiones descritas aquí, instala el código de **esta fork**.
 
-- A server with Node.js version 18.18+.
-- A PostgreSQL database version v12.14+.
+### Requisitos
 
-### Get the source code and install packages
+Necesitas **Node.js 22**, **pnpm 12.3.4** y **PostgreSQL**.
 
-```bash
-git clone https://github.com/umami-software/umami.git
-cd umami
-pnpm install
-```
-
-### Configure Umami
-
-Create an `.env` file with the following:
+### 1. Obtener el proyecto
 
 ```bash
-DATABASE_URL=connection-url
+git clone https://github.com/SantiagoCabana/umami-analytics-enhanced.git
+cd umami-analytics-enhanced
+pnpm install --frozen-lockfile
 ```
 
-Optional: set `API_URL` to change the base URL used by internal UI API calls.
-Relative paths are served under `BASE_PATH`; absolute URLs are proxied through the local `/api` route.
-For example, `API_URL=/internal-api` or `API_URL=https://api.example.com/api`.
+### 2. Configurar el entorno
 
-Optional: set `TWO_FACTOR_ENCRYPTION_KEY` to a 64-character hex string to enable two-factor
-authentication. Generate one with `openssl rand -hex 32`. Two-factor authentication is unavailable
-and cannot be required until this key is set.
+Crea un `.env` local con tus valores:
 
-MCP is disabled by default. Set `MCP_ENABLED=1` to enable the `/mcp` endpoint, then
-authenticate with an API key generated under Settings → API keys.
+```env
+DATABASE_URL=postgresql://user:password@localhost:5432/umami
+APP_SECRET=replace-with-a-persistent-random-secret
+BASE_DOMAIN=analytics.example.com
+```
 
-The connection URL format:
+Genera `APP_SECRET` con `openssl rand -hex 32` y consérvalo entre reinicios.
+`BASE_DOMAIN` es el hostname del panel, sin protocolo ni ruta.
+
+Opciones disponibles:
+
+| Variable | Uso |
+| --- | --- |
+| `TWO_FACTOR_ENCRYPTION_KEY` | Clave hexadecimal de 64 caracteres para habilitar 2FA. Genera otra clave con `openssl rand -hex 32` y consérvala entre despliegues. |
+| `API_URL` | Base de las llamadas API internas de la interfaz; admite una ruta relativa o una URL absoluta. |
+| `MCP_ENABLED=1` | Habilita `/mcp`, desactivado por defecto. Se autentica con una clave API creada en Configuración → API keys. |
+
+### 3. Compilar e iniciar
 
 ```bash
-postgresql://username:mypassword@localhost:5432/mydb
+pnpm build
+pnpm start
 ```
 
-### Custom short domains
+La compilación aplica migraciones: respalda una base existente antes de actualizar. La aplicación
+escucha en el puerto `3000`. En una instalación nueva, entra con `admin` / `umami` y cambia la contraseña.
 
-<p align="center">
-  <img src="src/assets/network.svg" alt="Custom short domains" width="72">
-</p>
-
-Umami Enhanced can publish shortened links on the primary application host and on verified custom
-hosts. A short host exposes only the public link and collection endpoints, so administrative pages
-remain available only on the primary application domain.
-
-Set `BASE_DOMAIN` to the primary application hostname, without a protocol or path:
-
-```bash
-BASE_DOMAIN=url.example.com
-```
-
-Add custom hosts in **Administration -> Domains**. Every custom host requires a root redirect URL.
-Requests to its `/` route redirect there; a nonexistent or unassigned `/q/<slug>` returns `404`.
-Before a host is saved, Umami verifies its public DNS, TLS certificate, and reverse-proxy routing
-through a short-lived signed HTTPS challenge. The same host can serve `/script.js`, `/recorder.js`,
-pixels, and the public collection endpoints without exposing `/admin`, `/login`, or other app routes.
-
-Read the complete guides:
-
-- [Custom short domains (English)](docs/short-domains.en.md)
-- [Dominios de enlaces cortos (Español)](docs/short-domains.md)
-
-### Build the Application
-
-```bash
-pnpm run build
-```
-
-The build step will create tables in your database if you are installing for the first time. It will also create a login user with username **admin** and password **umami**.
-
-### Start the Application
-
-```bash
-pnpm run start
-```
-
-By default, this will launch the application on `http://localhost:3000`. You will need to either [proxy](https://docs.nginx.com/nginx/admin-guide/web-server/reverse-proxy/) requests from your web server or change the [port](https://nextjs.org/docs/api-reference/cli#production) to serve the application directly.
+Para exponer la aplicación, configura un proxy inverso con HTTPS hacia el puerto `3000`.
+Conserva `Host` y `X-Forwarded-Host` al servir dominios adicionales y rechaza hosts desconocidos
+en el proxy. La validación de dominios requiere direcciones públicas; no acepta redes privadas.
 
 ---
 
-## 🐳 Installing with Docker
+## 🐳 Instalación con Docker
 
-Umami provides Docker images as well as a Docker compose file for easy deployment.
-
-Docker image:
-
-```bash
-docker pull docker.umami.is/umami-software/umami:latest
-```
-
-Docker compose (Runs Umami with a PostgreSQL database):
+Construye la imagen desde este repositorio para incluir Enhanced. El `docker-compose.yml` heredado
+descarga una imagen del upstream y no incorpora estas extensiones.
 
 ```bash
-docker compose up -d
+docker build -t umami-analytics-enhanced:local .
+docker run -d --name umami-enhanced --restart unless-stopped \
+  --env-file .env -p 3000:3000 umami-analytics-enhanced:local
 ```
+
+Usa las mismas variables del apartado anterior. La base debe ser accesible desde el contenedor:
+su `localhost` no es el servidor de PostgreSQL. El arranque aplica las migraciones pendientes.
 
 ---
 
-## 🔄 Getting Updates
+## 🔄 Actualizaciones
 
-To get the latest features, simply do a pull, install any new dependencies, and rebuild:
+Respalda la base antes de actualizar y revisa las migraciones incluidas en la nueva revisión.
+Para instalaciones desde código fuente:
 
 ```bash
-git pull
-pnpm install
+git pull --ff-only
+pnpm install --frozen-lockfile
 pnpm build
 ```
 
-To update the Docker image, simply pull the new images and rebuild:
-
-```bash
-docker compose pull
-docker compose up --force-recreate -d
-```
+Reinicia el servicio con la nueva compilación. En Docker, reconstruye la imagen y recrea el
+contenedor conservando la base y las variables, especialmente `APP_SECRET` y la clave de 2FA.
 
 ---
 
-## 🛟 Support
+## Soporte y licencia
 
 <p align="center">
-  <a href="https://github.com/umami-software/umami"><img src="https://img.shields.io/badge/GitHub--blue?style=social&logo=github" alt="GitHub" /></a>
-  <a href="https://twitter.com/umami_software"><img src="https://img.shields.io/badge/Twitter--blue?style=social&logo=twitter" alt="Twitter" /></a>
-  <a href="https://linkedin.com/company/umami-software"><img src="https://img.shields.io/badge/LinkedIn--blue?style=social&logo=linkedin" alt="LinkedIn" /></a>
-  <a href="https://umami.is/discord"><img src="https://img.shields.io/badge/Discord--blue?style=social&logo=discord" alt="Discord" /></a>
+  <a href="https://github.com/SantiagoCabana/umami-analytics-enhanced/issues">Incidencias de Enhanced</a> ·
+  <a href="https://umami.is/docs/">Documentación de Umami</a> ·
+  <a href="LICENSE">Licencia MIT</a>
 </p>
 
-[release-shield]: https://img.shields.io/github/release/umami-software/umami.svg
-[releases-url]: https://github.com/umami-software/umami/releases
-[license-shield]: https://img.shields.io/github/license/umami-software/umami.svg
-[license-url]: https://github.com/umami-software/umami/blob/master/LICENSE
-[build-shield]: https://img.shields.io/github/actions/workflow/status/umami-software/umami/ci.yml
-[build-url]: https://github.com/umami-software/umami/actions
-[github-shield]: https://img.shields.io/badge/GitHub--blue?style=social&logo=github
-[github-url]: https://github.com/umami-software/umami
-[twitter-shield]: https://img.shields.io/badge/Twitter--blue?style=social&logo=twitter
-[twitter-url]: https://twitter.com/umami_software
-[linkedin-shield]: https://img.shields.io/badge/LinkedIn--blue?style=social&logo=linkedin
-[linkedin-url]: https://linkedin.com/company/umami-software
-[discord-shield]: https://img.shields.io/badge/Discord--blue?style=social&logo=discord
-[discord-url]: https://discord.com/invite/4dz4zcXYrQ
+<p align="center">
+  <sub>Basado en Umami, de Umami Software, Inc. Se conservan el logo y los avisos originales.<br>
+  Esta fork es independiente y no es una distribución oficial.</sub>
+</p>
+
+Los iconos y diagramas de esta presentación son ilustraciones originales bajo la licencia del
+repositorio; no son capturas ni representan datos reales. El logo de Umami conserva su atribución
+al proyecto original.
+
+<a id="english"></a>
+<details>
+<summary><strong>English</strong></summary>
+
+## Umami Analytics Enhanced
+
+An independent [Umami](https://github.com/umami-software/umami) fork with three additions:
+
+Umami provides the underlying traffic, campaign, event, and conversion analytics. Enhanced adds
+tools for publishing short links and maintaining their destinations.
+
+- **Custom domains:** default-enabled links work on the primary host and every registered short
+  domain; exclusive assignments are also available.
+- **Root redirects:** choose where a short domain's root leads. Registered short hosts serve
+  links and collection endpoints without exposing the panel or login.
+- **Destination variables:** update shared values without editing each link. Manage them under
+  **Links → Variables**; they resolve on every click.
+
+<p align="center"><img src="docs/assets/link-flow-en.svg" width="760" alt="The primary and registered hosts share a default-enabled link that redirects to its destination."></p>
+
+Slugs are globally unique. To publish on selected hosts only, disable default publishing and assign
+those hosts. Unknown, deleted, or unpublished links return `404`. Add domains under
+**Administration → Domains** after configuring public DNS, TLS, and proxy routing. A signed HTTPS
+challenge verifies them before saving; it is a point-in-time check, not continuous monitoring.
+
+Registered short hosts allow `/`, `/q/<slug>`, `/p/<slug>`, `/script.js`, `/recorder.js`,
+`/api/send`, `/api/batch`, `/api/record`, and `/api/websites/<websiteId>/recorder`.
+The root redirects to its configured URL; private APIs, login, and admin routes return `404`.
+
+```text
+destination = https://example.com/contact
+
+${destination}?utm_campaign=summer
+→ https://example.com/contact?utm_campaign=summer
+```
+
+<p align="center"><img src="docs/assets/variable-flow-en.svg" width="760" alt="Define a variable, use it in multiple links, and update its value in one place."></p>
+
+A leading variable can supply a complete URL; subsequent variables are URL-encoded. Choose `?`
+or `&` according to the base URL. Names are normalized to lowercase, undefined references stay
+literal, and resolved destinations must use HTTP or HTTPS. Destinations support 2,000 characters.
+Website visits are not automatically attributed to a specific short link; use campaign parameters
+and an appropriate attribution setup.
+
+## Quick start
+
+Requires **Node.js 22**, **pnpm 12.3.4**, and **PostgreSQL**.
+
+### 1. Get the project
+
+```bash
+git clone https://github.com/SantiagoCabana/umami-analytics-enhanced.git
+cd umami-analytics-enhanced
+pnpm install --frozen-lockfile
+```
+
+### 2. Configure the environment
+
+Create a local `.env`:
+
+```env
+DATABASE_URL=postgresql://user:password@localhost:5432/umami
+APP_SECRET=replace-with-a-persistent-random-secret
+BASE_DOMAIN=analytics.example.com
+```
+
+Generate `APP_SECRET` with `openssl rand -hex 32` and retain it across restarts. `BASE_DOMAIN`
+is the panel hostname, without a protocol or path.
+
+Optional configuration:
+
+- `TWO_FACTOR_ENCRYPTION_KEY`: a separate, persistent 64-character hex key enables 2FA.
+- `API_URL`: overrides the interface's internal API base with a relative path or absolute URL.
+- `MCP_ENABLED=1`: enables `/mcp`, disabled by default; authenticate with an API key from Settings.
+
+### 3. Build and start
+
+```bash
+pnpm build
+pnpm start
+```
+
+The build applies migrations; back up an existing database before upgrading. The default port is
+`3000`. New installations start with `admin` / `umami`; change the password after signing in.
+
+Add domains under **Administration → Domains**, with DNS and HTTPS pointing to this instance.
+Preserve `Host` and `X-Forwarded-Host` and reject unknown hosts at the proxy. Domain verification
+requires public addresses and does not accept private networks.
+
+## 🐳 Docker installation
+
+Build this fork's Dockerfile; the inherited Compose file uses the upstream image.
+
+```bash
+docker build -t umami-analytics-enhanced:local .
+docker run -d --name umami-enhanced --restart unless-stopped \
+  --env-file .env -p 3000:3000 umami-analytics-enhanced:local
+```
+
+The database must be reachable from the container, whose `localhost` is not your database server.
+Startup applies pending migrations.
+
+## 🔄 Updates
+
+Back up the database and review migrations before upgrading. For source installations:
+
+```bash
+git pull --ff-only
+pnpm install --frozen-lockfile
+pnpm build
+```
+
+Restart the service after building. For Docker, rebuild the image and recreate the container while
+retaining the database and environment, particularly `APP_SECRET` and the 2FA encryption key.
+
+## Support and license
+
+<p align="center">
+  <a href="https://github.com/SantiagoCabana/umami-analytics-enhanced/issues">Enhanced issues</a> ·
+  <a href="https://umami.is/docs/">Umami documentation</a> ·
+  <a href="LICENSE">MIT license</a>
+</p>
+
+<p align="center"><sub>Based on Umami by Umami Software, Inc. Original logo and notices are retained.<br>
+This is an independent fork, not an official distribution.</sub></p>
+
+Presentation icons and diagrams are original illustrations under the repository license, not
+screenshots or real metrics. The Umami logo retains its upstream attribution.
+
+</details>

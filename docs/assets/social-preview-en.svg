@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="640" viewBox="0 0 1280 640" role="img" aria-labelledby="title desc">
+  <title id="title">Umami Analytics Enhanced</title>
+  <desc id="desc">Analytics, additional domains and destination variables for short links. An independent Umami fork.</desc>
+  <!-- Umami logo geometry from src/assets/logo.svg; copyright Umami Software, Inc. See ../../LICENSE. -->
+  <rect width="1280" height="640" fill="#f8fafc"/>
+  <rect x="64" y="64" width="1152" height="512" rx="24" fill="#fff" stroke="#e2e8f0" stroke-width="2"/>
+  <g transform="translate(112 112) scale(.22)" fill="#17252c" stroke="#17252c">
+    <circle cx="214.15" cy="181" r="171" fill="none" stroke-miterlimit="10" stroke-width="20"/>
+    <path d="M413 134.11H15.29a15 15 0 0 0-15 15v15.3C.12 168 0 171.52 0 175.11c0 118.19 95.81 214 214 214 116.4 0 211.1-92.94 213.93-208.67 0-.44.07-.88.07-1.33v-30a15 15 0 0 0-15-15Z"/>
+  </g>
+  <g font-family="Arial, sans-serif">
+    <text x="112" y="292" font-size="50" font-weight="700" fill="#17252c">Umami Analytics Enhanced</text>
+    <path d="M112 325h64" stroke="#527e80" stroke-width="4"/>
+    <text x="112" y="382" font-size="27" fill="#475569">Analytics, additional domains and destination</text>
+    <text x="112" y="422" font-size="27" fill="#475569">variables for short links.</text>
+    <text x="112" y="516" font-size="20" fill="#64748b">An independent Umami fork</text>
+  </g>
+</svg>

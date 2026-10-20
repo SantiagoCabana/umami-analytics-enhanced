@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="160" viewBox="0 0 920 160" role="img" aria-labelledby="title">
+  <title id="title">One reusable variable across multiple links</title>
+  <rect x="1" y="1" width="918" height="158" rx="12" fill="#f8fafc" stroke="#d0d7de"/>
+  <path d="M290 80H325M315 74l10 6-10 6M595 80H630M620 74l10 6-10 6" fill="none" stroke="#527c83" stroke-width="2"/>
+  <g font-family="Arial,sans-serif" text-anchor="middle" fill="#24292f">
+    <rect x="20" y="30" width="270" height="100" rx="8" fill="#fff" stroke="#d0d7de"/>
+    <text x="155" y="69" font-size="18">Define a variable</text><text x="155" y="100" font-size="16" fill="#57606a">destination = URL</text>
+    <rect x="325" y="30" width="270" height="100" rx="8" fill="#edf5f4" stroke="#aecac8"/>
+    <text x="460" y="69" font-size="18">Use it in your links</text><text x="460" y="100" font-size="15">${destination}?utm_campaign=…</text>
+    <rect x="630" y="30" width="270" height="100" rx="8" fill="#fff" stroke="#d0d7de"/>
+    <text x="765" y="69" font-size="18">Update one value</text><text x="765" y="100" font-size="16" fill="#57606a">Resolved on every click</text>
+  </g>
+</svg>

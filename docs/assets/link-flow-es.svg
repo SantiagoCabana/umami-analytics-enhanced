@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="230" viewBox="0 0 920 230" role="img" aria-labelledby="title">
+  <title id="title">Publicación de un enlace predeterminado</title>
+  <rect x="1" y="1" width="918" height="228" rx="12" fill="#f8fafc" stroke="#d0d7de"/>
+  <g fill="none" stroke="#527c83" stroke-width="2"><path d="M280 65H315V115H350M280 165H315V115M610 115H655"/><path d="m645 109 10 6-10 6"/></g>
+  <g font-family="Arial,sans-serif" text-anchor="middle" fill="#24292f">
+    <rect x="20" y="25" width="260" height="80" rx="8" fill="#fff" stroke="#d0d7de"/>
+    <text x="150" y="57" font-size="18">Dominio principal</text><text x="150" y="84" font-size="15" fill="#57606a">analytics.example.com</text>
+    <rect x="20" y="125" width="260" height="80" rx="8" fill="#fff" stroke="#d0d7de"/>
+    <text x="150" y="157" font-size="18">Dominio registrado</text><text x="150" y="184" font-size="15" fill="#57606a">go.example.com</text>
+    <rect x="350" y="75" width="260" height="80" rx="8" fill="#edf5f4" stroke="#aecac8"/>
+    <text x="480" y="107" font-size="18">Mismo enlace</text><text x="480" y="134" font-size="16">/q/campaign</text>
+    <rect x="655" y="75" width="245" height="80" rx="8" fill="#fff" stroke="#d0d7de"/>
+    <text x="777" y="122" font-size="18">URL de destino</text>
+  </g>
+</svg>

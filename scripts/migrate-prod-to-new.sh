@@ -25,9 +25,11 @@ Options:
   --dry-run                 Inspect the planned copy only (default).
   --apply                   Perform the selected migration mode.
   --mode initial            Replace NEW business data, then import rows before --cutoff.
-  --mode refresh            Replace rows in NEW from --from (inclusive) through --cutoff
-                            (exclusive), then import the same source interval.
-  --from TIMESTAMP          Required with --mode refresh. ISO-8601 timestamp.
+   --mode refresh            Replace rows in NEW from --from (inclusive) through --cutoff
+                             (exclusive), then import the same source interval.
+   --mode append-missing     Insert only missing analytics rows from PROD in the interval.
+                             Existing rows and configuration in NEW are preserved.
+   --from TIMESTAMP          Required with --mode refresh or --mode append-missing.
   --cutoff TIMESTAMP        Exclusive ISO-8601 upper bound. Default:
                             2026-10-12T05:00:00Z (2026-10-12 00:00 Peru).
   --help                    Show this help.
@@ -83,7 +85,8 @@ while (($#)); do
   shift
 done
 
-[[ "$MODE" == initial || "$MODE" == refresh ]] || fail '--mode must be initial or refresh'
+[[ "$MODE" == initial || "$MODE" == refresh || "$MODE" == append-missing ]] \
+  || fail '--mode must be initial, refresh, or append-missing'
 [[ -f "$ENV_FILE" ]] || fail "missing environment file: $ENV_FILE"
 
 set -a
@@ -94,8 +97,10 @@ set +a
 [[ -n "${UMAMI_BD_PROD:-}" ]] || fail 'UMAMI_BD_PROD is not configured'
 [[ -n "${UMAMI_BD_NEW:-}" ]] || fail 'UMAMI_BD_NEW is not configured'
 [[ "$UMAMI_BD_PROD" != "$UMAMI_BD_NEW" ]] || fail 'source and destination connections must differ'
-[[ -z "$FROM" || "$MODE" == refresh ]] || fail '--from is valid only with --mode refresh'
-[[ "$MODE" == initial || -n "$FROM" ]] || fail '--from is required with --mode refresh'
+[[ -z "$FROM" || "$MODE" == refresh || "$MODE" == append-missing ]] \
+  || fail '--from is valid only with --mode refresh or --mode append-missing'
+[[ "$MODE" == initial || -n "$FROM" ]] \
+  || fail '--from is required with --mode refresh or --mode append-missing'
 
 psql_source() {
   psql "$UMAMI_BD_PROD" -X -v ON_ERROR_STOP=1 "$@"
@@ -155,6 +160,27 @@ readonly -a IMPORT_ORDER=(
   session_replay_saved
   session_replay
 )
+
+# This mode is intentionally analytics-only. Configuration is compared first
+# and remains untouched because NEW can already receive live traffic/settings.
+readonly -a APPEND_MISSING_ORDER=(
+  session
+  website_event
+  event_data
+  session_data
+  session_link
+  revenue
+  heatmap_event
+  session_replay_saved
+  session_replay
+)
+
+declare -a TABLES
+if [[ "$MODE" == append-missing ]]; then
+  TABLES=("${APPEND_MISSING_ORDER[@]}")
+else
+  TABLES=("${IMPORT_ORDER[@]}")
+fi
 
 readonly -a DESTINATION_BUSINESS_TABLES=(
   annotation
@@ -269,7 +295,7 @@ print_plan() {
   printf '%-24s %14s %14s\n' table source_rows destination_rows
 
   local table
-  for table in "${IMPORT_ORDER[@]}"; do
+  for table in "${TABLES[@]}"; do
     printf '%-24s %14s %14s\n' "$table" "$(count_source_rows "$table")" "$(count_destination_rows "$table")"
   done
 }
@@ -321,6 +347,20 @@ write_table_copy() {
   printf '\\copy "%s" (%s) FROM %q WITH (FORMAT csv)\n' "$table" "$columns" "$STAGE_DIR/$table.csv"
 }
 
+write_append_missing_copy() {
+  local table="$1"
+  local columns stage_table
+  columns="$(common_columns "$table")"
+  stage_table="stage_${table}"
+
+  printf 'CREATE TEMP TABLE "%s" (LIKE "%s" INCLUDING DEFAULTS) ON COMMIT DROP;\n' \
+    "$stage_table" "$table"
+  printf '\\copy "%s" (%s) FROM %q WITH (FORMAT csv)\n' \
+    "$stage_table" "$columns" "$STAGE_DIR/$table.csv"
+  printf 'INSERT INTO "%s" (%s) SELECT %s FROM "%s" ON CONFLICT DO NOTHING;\n' \
+    "$table" "$columns" "$columns" "$stage_table"
+}
+
 print_plan
 
 if [[ "$DRY_RUN" == true ]]; then
@@ -331,7 +371,7 @@ fi
 STAGE_DIR="$(mktemp -d /tmp/opencode/umami-migration.XXXXXXXX)"
 chmod 700 "$STAGE_DIR"
 
-for table in "${IMPORT_ORDER[@]}"; do
+for table in "${TABLES[@]}"; do
   stage_table "$table"
 done
 
@@ -341,21 +381,27 @@ SQL_FILE="$STAGE_DIR/import.sql"
   if [[ "$MODE" == initial ]]; then
     printf 'clearing_destination_business_data=true\n' >&2
     write_initial_clear
-  else
+  elif [[ "$MODE" == refresh ]]; then
     printf 'clearing_destination_window=true\n' >&2
     write_refresh_window_clear
+  else
+    printf 'preserving_destination_rows=true\n' >&2
   fi
-  for table in "${IMPORT_ORDER[@]}"; do
-    write_table_copy "$table"
+  for table in "${TABLES[@]}"; do
+    if [[ "$MODE" == append-missing ]]; then
+      write_append_missing_copy "$table"
+    else
+      write_table_copy "$table"
+    fi
   done
   printf 'COMMIT;\n'
 } > "$SQL_FILE"
 
 printf 'importing_staged_rows_in_one_destination_transaction=true\n'
-psql_destination -q -f "$SQL_FILE"
+psql_destination -v ON_ERROR_STOP=1 -q -f "$SQL_FILE"
 
 printf '%-24s %14s\n' table destination_rows_after
-for table in "${IMPORT_ORDER[@]}"; do
+for table in "${TABLES[@]}"; do
   printf '%-24s %14s\n' "$table" "$(count_destination_rows "$table")"
 done
 

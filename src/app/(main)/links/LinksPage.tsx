@@ -26,7 +26,7 @@ export function LinksPage() {
       <Column gap="6" margin="2">
         <PageHeader title={t(labels.links)}>
           <Row alignItems="center" gap="3">
-            {user.isAdmin && <LinkVariablesButton />}
+            <LinkVariablesButton />
             {showActions && <LinkAddButton teamId={teamId} />}
           </Row>
         </PageHeader>

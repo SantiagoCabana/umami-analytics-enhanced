@@ -17,7 +17,11 @@
       "require": "./dist/index.cjs"
     }
   },
-  "files": ["bin", "dist", "README.md"],
+  "files": [
+    "bin",
+    "dist",
+    "README.md"
+  ],
   "engines": {
     "node": ">=20"
   },
@@ -32,12 +36,12 @@
     "start": "node dist/cli.js"
   },
   "dependencies": {
-    "@modelcontextprotocol/server": "^2.0.0",
-    "@umami/api-client": "^0.81.0",
+    "@modelcontextprotocol/server": "^2.3.1",
+    "@umami/api-client": "workspace:^",
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@modelcontextprotocol/client": "^2.0.0",
+    "@modelcontextprotocol/client": "^2.3.1",
     "@types/node": "^26.4.0",
     "tsup": "^8.5.0",
     "typescript": "^6.0.3",

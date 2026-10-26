@@ -1,8 +1,13 @@
+import { ROLES } from './constants';
 import { isValidLinkUrl } from './link-domains';
 
 export const LINK_VARIABLE_REGEX = /\$\{([a-z][a-z0-9_]*)\}/gi;
 export const LINK_VARIABLE_NAME_REGEX = /^[a-z][a-z0-9_]{0,63}$/;
 const INITIAL_VARIABLE_REGEX = /^\$\{([a-z][a-z0-9_]*)\}/i;
+
+export function canAccessLinkVariables(user?: { role: string; isAdmin?: boolean }) {
+  return user?.isAdmin === true || user?.role === ROLES.user;
+}
 
 export function normalizeLinkVariableName(value?: string | null) {
   const name = value?.trim().toLowerCase();

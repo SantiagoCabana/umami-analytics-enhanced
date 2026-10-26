@@ -1,3 +1,4 @@
+import { canAccessLinkVariables } from '@/lib/link-variables';
 import type { Auth } from '@/lib/types';
 
 export async function canCreateUser({ user }: Auth) {
@@ -49,5 +50,5 @@ export async function canManageLinkDomains({ user }: Auth) {
 }
 
 export async function canManageLinkVariables({ user }: Auth) {
-  return user?.isAdmin ?? false;
+  return canAccessLinkVariables(user);
 }

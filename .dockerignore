@@ -9,6 +9,8 @@ Dockerfile
 .idea
 .env
 .env.*
+.externals
+.opencode
 scripts/seed
 scripts/seed-data.ts
 tests

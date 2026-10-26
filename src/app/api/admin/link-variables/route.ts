@@ -44,14 +44,14 @@ export async function POST(request: Request) {
     return error();
   }
 
+  if (!(await canManageLinkVariables(auth))) {
+    return unauthorized();
+  }
+
   const result = linkVariableSchema.safeParse(body);
 
   if (!result.success) {
     return badRequest({ message: result.error.issues[0]?.message });
-  }
-
-  if (!(await canManageLinkVariables(auth))) {
-    return unauthorized();
   }
 
   const name = normalizeLinkVariableName(result.data.name);

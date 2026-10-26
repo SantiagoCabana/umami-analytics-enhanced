@@ -12,9 +12,16 @@ import {
 } from '@umami/react-zen';
 import { useState } from 'react';
 import { LinkButton } from '@/components/common/LinkButton';
-import { useApi, useLinkVariablesQuery, useMessages, useModified } from '@/components/hooks';
+import {
+  useApi,
+  useLinkVariablesQuery,
+  useLoginQuery,
+  useMessages,
+  useModified,
+  useNavigation,
+} from '@/components/hooks';
 import { Edit, Plus, Trash, Variable } from '@/components/icons';
-import { normalizeLinkVariableName } from '@/lib/link-variables';
+import { canAccessLinkVariables, normalizeLinkVariableName } from '@/lib/link-variables';
 
 type LinkVariable = {
   id: string;
@@ -30,9 +37,15 @@ type LinkVariableInput = {
 
 export function LinkVariablesButton() {
   const { t, labels } = useMessages();
+  const { user } = useLoginQuery();
+  const { renderUrl } = useNavigation();
+
+  if (!canAccessLinkVariables(user)) {
+    return null;
+  }
 
   return (
-    <LinkButton href="/links/variables" variant="outline">
+    <LinkButton href={renderUrl('/links/variables', false)} variant="outline">
       <Icon>
         <Variable />
       </Icon>
@@ -43,6 +56,7 @@ export function LinkVariablesButton() {
 
 export function LinkVariablesManager({ onClose }: { onClose?: () => void }) {
   const { t, labels, messages, getErrorMessage } = useMessages();
+  const { user } = useLoginQuery();
   const { post, del, useMutation } = useApi();
   const { touch } = useModified();
   const { data, isLoading, error } = useLinkVariablesQuery();
@@ -92,7 +106,7 @@ export function LinkVariablesManager({ onClose }: { onClose?: () => void }) {
       </Column>
 
       <Column gap="3">
-        <Heading size="md">{editing ? t(labels.edit) : t(labels.add)}</Heading>
+        <Heading size="base">{editing ? t(labels.edit) : t(labels.add)}</Heading>
         <Form
           key={editing?.id || 'new'}
           defaultValues={{ name: editing?.name || '', value: editing?.value || '' }}
@@ -109,7 +123,11 @@ export function LinkVariablesManager({ onClose }: { onClose?: () => void }) {
               rules={{ required: t(labels.required), validate: checkName }}
               style={{ flex: 1 }}
             >
-              <TextField placeholder="whatsapp_token" autoComplete="off" />
+              <TextField
+                placeholder="whatsapp_token"
+                autoComplete="off"
+                isReadOnly={!!editing && !user.isAdmin}
+              />
             </FormField>
             <FormField
               label={t(labels.value)}
@@ -136,7 +154,7 @@ export function LinkVariablesManager({ onClose }: { onClose?: () => void }) {
 
       <Column gap="3">
         <Row alignItems="center" justifyContent="space-between">
-          <Heading size="md">{t(labels.variables)}</Heading>
+          <Heading size="base">{t(labels.variables)}</Heading>
           {!isLoading && !error && <Text color="muted">{variables.length}</Text>}
         </Row>
         {isLoading ? (

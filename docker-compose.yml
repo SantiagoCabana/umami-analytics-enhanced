@@ -1,21 +1,25 @@
 ---
 services:
   umami:
-    image: ghcr.io/umami-software/umami:latest
+    build:
+      context: .
+    image: umami-analytics-enhanced:local
     ports:
       - "3000:3000"
     environment:
-      DATABASE_URL: postgresql://umami:umami@db:5432/umami
-      APP_SECRET: replace-me-with-a-random-string
+      DATABASE_URL: postgresql://umami:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD to a persistent hexadecimal password}@db:5432/umami
+      APP_SECRET: ${APP_SECRET:?Set a persistent APP_SECRET}
+      BASE_DOMAIN: ${BASE_DOMAIN:-localhost}
       # Required for two-factor authentication, generate with: openssl rand -hex 32
-      TWO_FACTOR_ENCRYPTION_KEY: replace-me-with-a-64-character-hex-string
+      TWO_FACTOR_ENCRYPTION_KEY: ${TWO_FACTOR_ENCRYPTION_KEY:-}
     depends_on:
       db:
         condition: service_healthy
     init: true
     restart: always
     healthcheck:
-      test: ["CMD-SHELL", "curl http://localhost:3000/api/heartbeat"]
+      test: ["CMD-SHELL", "curl --fail --silent http://localhost:3000/api/heartbeat"]
+      start_period: 60s
       interval: 5s
       timeout: 5s
       retries: 5
@@ -24,7 +28,7 @@ services:
     environment:
       POSTGRES_DB: umami
       POSTGRES_USER: umami
-      POSTGRES_PASSWORD: umami
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD to a persistent hexadecimal password}
     volumes:
       - umami-db-data:/var/lib/postgresql/data
     restart: always

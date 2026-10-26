@@ -5,6 +5,10 @@ export async function getLinkVariables() {
   return prisma.client.linkVariable.findMany({ orderBy: { name: 'asc' } });
 }
 
+export async function getLinkVariable(linkVariableId: string) {
+  return prisma.client.linkVariable.findUnique({ where: { id: linkVariableId } });
+}
+
 export async function getLinkVariablesByNames(names: string[]) {
   if (names.length === 0) {
     return [];
@@ -19,7 +23,7 @@ export async function createLinkVariable(data: { name: string; value: string }) 
 
 export async function updateLinkVariable(
   linkVariableId: string,
-  data: { name: string; value: string },
+  data: { name?: string; value: string },
 ) {
   return prisma.client.linkVariable.update({ where: { id: linkVariableId }, data });
 }

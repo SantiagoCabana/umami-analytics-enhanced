@@ -16,6 +16,10 @@
 </p>
 
 <p align="center">
+  Self-hosted web analytics with multi-domain short links, root redirects and dynamic destination variables.
+</p>
+
+<p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="Licencia MIT"></a>
   <a href="https://github.com/umami-software/umami"><img src="https://img.shields.io/badge/based%20on-Umami-black" alt="Basado en Umami"></a>
 </p>
@@ -147,8 +151,30 @@ en el proxy. La validación de dominios requiere direcciones públicas; no acept
 
 ## 🐳 Instalación con Docker
 
-Construye la imagen desde este repositorio para incluir Enhanced. El `docker-compose.yml` heredado
-descarga una imagen del upstream y no incorpora estas extensiones.
+Compose construye Enhanced desde este repositorio e inicia PostgreSQL con un volumen persistente.
+Para una instalación nueva, crea un archivo local `.env.compose` con estos valores:
+
+```env
+POSTGRES_PASSWORD=replace-with-a-random-hexadecimal-password
+APP_SECRET=replace-with-a-persistent-random-secret
+BASE_DOMAIN=analytics.example.com
+```
+
+Genera cada secreto por separado con `openssl rand -hex 32`, sustituye los ejemplos y conserva el
+archivo entre despliegues. No lo publiques. La contraseña hexadecimal evita caracteres especiales
+en la URL de PostgreSQL. Para habilitar 2FA, añade una clave persistente `TWO_FACTOR_ENCRYPTION_KEY`
+de 64 caracteres hexadecimales.
+
+```bash
+docker compose --env-file .env.compose up --build -d
+```
+
+El arranque aplica migraciones. Si ya tienes un volumen de PostgreSQL, conserva su contraseña:
+cambiar la variable no cambia la contraseña de una base existente. Para actualizar, respalda la base
+y vuelve a ejecutar el comando después de actualizar el código. Evita `down --volumes` si deseas
+conservar los datos.
+
+Si usas una base externa, puedes construir y ejecutar solamente la aplicación:
 
 ```bash
 docker build -t umami-analytics-enhanced:local .
@@ -285,7 +311,28 @@ requires public addresses and does not accept private networks.
 
 ## 🐳 Docker installation
 
-Build this fork's Dockerfile; the inherited Compose file uses the upstream image.
+Compose builds Enhanced from this repository and starts PostgreSQL with a persistent volume.
+For a new installation, create a local `.env.compose`:
+
+```env
+POSTGRES_PASSWORD=replace-with-a-random-hexadecimal-password
+APP_SECRET=replace-with-a-persistent-random-secret
+BASE_DOMAIN=analytics.example.com
+```
+
+Generate each secret separately with `openssl rand -hex 32`, replace the examples, and keep the
+file across deployments. Do not commit it. A hexadecimal database password avoids URL-special
+characters. Optionally add a persistent 64-character hexadecimal `TWO_FACTOR_ENCRYPTION_KEY` for 2FA.
+
+```bash
+docker compose --env-file .env.compose up --build -d
+```
+
+Startup applies migrations. Keep the existing password when reusing a PostgreSQL volume; changing
+the variable does not change an existing database password. Back up before upgrading, then rerun
+the command after updating the code. Do not use `down --volumes` to preserve your data.
+
+For an external database, build and run the application alone:
 
 ```bash
 docker build -t umami-analytics-enhanced:local .

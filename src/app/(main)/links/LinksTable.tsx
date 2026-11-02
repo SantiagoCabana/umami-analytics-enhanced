@@ -11,6 +11,7 @@ import {
   useSlug,
   useTimezone,
 } from '@/components/hooks';
+import { formatTableDate } from '@/lib/table-date';
 import { LinkDeleteButton } from './LinkDeleteButton';
 import { LinkEditButton } from './LinkEditButton';
 
@@ -31,8 +32,6 @@ export function LinksTable({
   const chartsQuery = useLinkListChartsQuery(linkIds);
   const charts = chartsQuery.data?.data || {};
   const isChartLoading = chartsQuery.isLoading && !chartsQuery.data;
-  const formatDate = (value: string | null, format: string) =>
-    value && Number.isFinite(Date.parse(value)) ? formatTimezoneDate(value, format) : '—';
 
   return (
     <DataTable {...props} data={data}>
@@ -105,7 +104,7 @@ export function LinksTable({
         width="150px"
         className="items-center"
       >
-        {(row: any) => <Text>{formatDate(row.createdAt, 'dd-MM-yyyy')}</Text>}
+        {(row: any) => <Text>{formatTableDate(row.createdAt, formatTimezoneDate)}</Text>}
       </DataColumn>
       <DataColumn
         id="updated"
@@ -115,7 +114,9 @@ export function LinksTable({
         width="160px"
         className="items-center"
       >
-        {(row: any) => <Text>{formatDate(row.updatedAt, 'dd-MM-yyyy HH:mm')}</Text>}
+        {(row: any) => (
+          <Text>{formatTableDate(row.updatedAt, formatTimezoneDate, t(labels.today))}</Text>
+        )}
       </DataColumn>
       {showActions && (
         <DataColumn id="action" align="end" width="72px" className="items-center">

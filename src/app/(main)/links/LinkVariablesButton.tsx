@@ -29,6 +29,7 @@ import { Edit, Plus, Trash, Variable } from '@/components/icons';
 import { DialogButton } from '@/components/input/DialogButton';
 import { sortLinkVariables, type VariableSort } from '@/lib/link-variable-sort';
 import { canAccessLinkVariables, normalizeLinkVariableName } from '@/lib/link-variables';
+import { formatTableDate } from '@/lib/table-date';
 
 type LinkVariable = {
   id: string;
@@ -100,8 +101,6 @@ export function LinkVariablesManager({ onClose }: { onClose?: () => void }) {
   });
 
   const variables = sortLinkVariables((data || []) as LinkVariable[], sort);
-  const formatDate = (value: string | null, format: string) =>
-    value && Number.isFinite(Date.parse(value)) ? formatTimezoneDate(value, format) : '—';
   const sortOptions: { id: VariableSort; label: string }[] = [
     { id: 'name-asc', label: labels.variableSortNameAsc },
     { id: 'name-desc', label: labels.variableSortNameDesc },
@@ -197,7 +196,9 @@ export function LinkVariablesManager({ onClose }: { onClose?: () => void }) {
               width="120px"
               className="items-center"
             >
-              {(item: LinkVariable) => <Text>{formatDate(item.createdAt, 'dd-MM-yyyy')}</Text>}
+              {(item: LinkVariable) => (
+                <Text>{formatTableDate(item.createdAt, formatTimezoneDate)}</Text>
+              )}
             </DataColumn>
             <DataColumn
               id="updated"
@@ -206,7 +207,7 @@ export function LinkVariablesManager({ onClose }: { onClose?: () => void }) {
               className="items-center"
             >
               {(item: LinkVariable) => (
-                <Text>{formatDate(item.updatedAt, 'dd-MM-yyyy HH:mm')}</Text>
+                <Text>{formatTableDate(item.updatedAt, formatTimezoneDate, t(labels.today))}</Text>
               )}
             </DataColumn>
             <DataColumn

@@ -54,7 +54,7 @@ test('shows creation and missing update dates', () => {
   expect(screen.getByRole('table')).toBeInTheDocument();
 });
 
-test('shows the exact update date with hours and minutes', () => {
+test('shows the update date for a different day', () => {
   state.query.mockReturnValue({
     data: [
       {
@@ -69,7 +69,7 @@ test('shows the exact update date with hours and minutes', () => {
     error: null,
   });
   render(<LinkVariablesManager />);
-  expect(screen.getByText('dd-MM-yyyy HH:mm: 2026-11-02T15:42:00.000Z')).toBeInTheDocument();
+  expect(screen.getByText('dd-MM-yyyy: 2026-11-02T15:42:00.000Z')).toBeInTheDocument();
 });
 
 test('offers the accessible variable sort control and changes the displayed order', async () => {

@@ -1,11 +1,16 @@
 import { DataColumn, DataTable, type DataTableProps, Icon, Text } from '@umami/react-zen';
 import { type ReactNode, useMemo } from 'react';
-import { DateDistance } from '@/components/common/DateDistance';
 import { LinkButton } from '@/components/common/LinkButton';
 import { SortableLabel } from '@/components/common/SortableLabel';
-import { useMessages, useNavigation, useWebsiteListChartsQuery } from '@/components/hooks';
+import {
+  useMessages,
+  useNavigation,
+  useTimezone,
+  useWebsiteListChartsQuery,
+} from '@/components/hooks';
 import { SquarePen } from '@/components/icons';
 import { decodePunycodeDomain } from '@/lib/format';
+import { formatTableDate } from '@/lib/table-date';
 import { WebsiteSparkline } from './WebsiteSparkline';
 
 export interface WebsitesTableProps extends DataTableProps {
@@ -20,6 +25,7 @@ export function WebsitesTable({
   ...props
 }: WebsitesTableProps & { data?: any[] }) {
   const { t, labels } = useMessages();
+  const { formatTimezoneDate } = useTimezone();
   const { renderUrl } = useNavigation();
   const websiteIds = useMemo(() => data.map(row => row.id), [data]);
   const chartsQuery = useWebsiteListChartsQuery(websiteIds);
@@ -74,7 +80,7 @@ export function WebsitesTable({
         }
         width="180px"
       >
-        {(row: any) => <DateDistance date={new Date(row.createdAt)} />}
+        {(row: any) => <Text>{formatTableDate(row.createdAt, formatTimezoneDate)}</Text>}
       </DataColumn>
       {showActions && (
         <DataColumn id="action" label=" " align="end" width="48px">

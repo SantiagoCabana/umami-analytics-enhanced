@@ -17,7 +17,7 @@ export function ApiKeysPage() {
 
   return (
     <PageBody>
-      <Column gap="6">
+      <Column gap="3">
         <PageHeader title={t(labels.apiKeys)}>
           <ApiKeyAddButton />
         </PageHeader>

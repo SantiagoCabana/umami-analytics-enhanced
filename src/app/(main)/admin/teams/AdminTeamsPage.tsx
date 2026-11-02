@@ -12,7 +12,7 @@ export function AdminTeamsPage() {
   const handleSave = () => {};
 
   return (
-    <Column gap="6" margin="2">
+    <Column gap="3" margin="2">
       <PageHeader title={t(labels.teams)}>
         <TeamsAddButton onSave={handleSave} isAdmin={true} />
       </PageHeader>

@@ -22,7 +22,7 @@ export function PixelsPage() {
 
   return (
     <PageBody>
-      <Column gap="6" margin="2">
+      <Column gap="3" margin="2">
         <PageHeader title={t(labels.pixels)}>
           {showActions && <PixelAddButton teamId={teamId} />}
         </PageHeader>

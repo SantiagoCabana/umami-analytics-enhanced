@@ -50,6 +50,7 @@ export function DataTable(props: DataTableProps) {
       // Low-height screens still get a usable scroll area; the page can scroll to it.
       const height = Math.max(Math.min(160, viewportHeight * 0.4), bottom - top - reserved);
       element.style.maxHeight = `${Math.floor(height)}px`;
+      element.style.height = props.displayMode === 'cards' ? 'auto' : `${Math.floor(height)}px`;
     };
     const schedule = () => {
       cancelAnimationFrame(frame);
@@ -70,7 +71,7 @@ export function DataTable(props: DataTableProps) {
       window.removeEventListener('resize', schedule);
       window.visualViewport?.removeEventListener('resize', schedule);
     };
-  }, []);
+  }, [props.displayMode]);
 
   return (
     <div

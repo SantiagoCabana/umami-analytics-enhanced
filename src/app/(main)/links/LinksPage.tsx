@@ -25,8 +25,8 @@ export function LinksPage() {
     : user.role !== ROLES.viewOnly;
 
   return (
-    <PageBody maxWidth="1680px">
-      <Column gap="6" margin="2">
+    <PageBody>
+      <Column gap="3" margin="2">
         <PageHeader title={t(labels.links)}>
           <Row alignItems="center" gap="3">
             <LinkVariablesButton />

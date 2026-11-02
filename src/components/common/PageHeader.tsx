@@ -8,7 +8,7 @@ export function PageHeader({
   label,
   icon,
   showBorder = true,
-  compact = false,
+  compact = true,
   titleHref,
   children,
 }: {

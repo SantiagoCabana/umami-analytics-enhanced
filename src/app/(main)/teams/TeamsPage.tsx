@@ -8,7 +8,7 @@ import { Panel } from '@/components/common/Panel';
 export function TeamsPage() {
   return (
     <PageBody>
-      <Column gap="6">
+      <Column gap="3">
         <TeamsHeader />
         <Panel>
           <TeamsDataTable />

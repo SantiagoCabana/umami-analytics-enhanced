@@ -1,5 +1,6 @@
 {
   "label": {
+    "variable-example": "Example",
     "variable-sort": "Sort variables",
     "variable-sort-name-asc": "Name: A–Z",
     "variable-sort-name-desc": "Name: Z–A",
@@ -456,6 +457,10 @@
     "deny": "Deny"
   },
   "message": {
+    "variable-example-intro": "Create a variable and use it in a link destination:",
+    "variable-example-result": "Links use the current value on the next click.",
+    "variable-delete-confirm": "Delete variable {name}?",
+    "variable-delete-warning": "Links using this variable may no longer redirect correctly.",
     "action-confirmation": "Type {confirmation} in the box below to confirm.",
     "active-users": "{x} current {x, plural, one {visitor} other {visitors}}",
     "bad-request": "Bad request",

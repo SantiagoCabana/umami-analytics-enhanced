@@ -1,5 +1,6 @@
 {
   "label": {
+    "variable-example": "Ejemplo",
     "variable-sort": "Ordenar variables",
     "variable-sort-name-asc": "Nombre: A–Z",
     "variable-sort-name-desc": "Nombre: Z–A",
@@ -445,6 +446,10 @@
     "two-factor-login": "Autenticación de dos factores"
   },
   "message": {
+    "variable-example-intro": "Crea una variable y úsala en el destino de un enlace:",
+    "variable-example-result": "Los enlaces usan el valor actual en el siguiente clic.",
+    "variable-delete-confirm": "¿Eliminar la variable {name}?",
+    "variable-delete-warning": "Los enlaces que la usan podrían dejar de redirigir correctamente.",
     "action-confirmation": "Escriba {confirmation} en el cuadro a continuación para confirmar.",
     "active-users": "{x} {x, plural, one {activo} other {activos}}",
     "bad-request": "Solicitud incorrecta",

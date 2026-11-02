@@ -1,10 +1,10 @@
+import { useQueryClient } from '@tanstack/react-query';
 import {
   Button,
   Column,
   Form,
   FormField,
   FormSubmitButton,
-  Heading,
   Icon,
   ListItem,
   Row,
@@ -13,17 +13,18 @@ import {
   TextField,
 } from '@umami/react-zen';
 import { useState } from 'react';
+import { ConfirmationForm } from '@/components/common/ConfirmationForm';
 import { LinkButton } from '@/components/common/LinkButton';
 import {
   useApi,
   useLinkVariablesQuery,
   useLoginQuery,
   useMessages,
-  useModified,
   useNavigation,
   useTimezone,
 } from '@/components/hooks';
 import { Edit, Plus, Trash, Variable } from '@/components/icons';
+import { DialogButton } from '@/components/input/DialogButton';
 import { sortLinkVariables, type VariableSort } from '@/lib/link-variable-sort';
 import { canAccessLinkVariables, normalizeLinkVariableName } from '@/lib/link-variables';
 
@@ -65,50 +66,42 @@ export function LinkVariablesManager({ onClose }: { onClose?: () => void }) {
   const { user } = useLoginQuery();
   const { formatTimezoneDate } = useTimezone();
   const { post, del, useMutation } = useApi();
-  const { touch } = useModified();
+  const queryClient = useQueryClient();
   const { data, isLoading, error } = useLinkVariablesQuery();
-  const [editing, setEditing] = useState<LinkVariable | null>(null);
-  const [addedVariables, setAddedVariables] = useState<LinkVariable[]>([]);
-  const [updatedVariables, setUpdatedVariables] = useState<Record<string, LinkVariable>>({});
-  const [removedVariableIds, setRemovedVariableIds] = useState<string[]>([]);
+  const [editing, setEditing] = useState<LinkVariable | 'new' | null>(null);
+  const [deleting, setDeleting] = useState<LinkVariable | null>(null);
   const [sort, setSort] = useState<VariableSort>('name-asc');
 
+  const refresh = () => queryClient.invalidateQueries({ queryKey: ['link-variables'] });
   const saveMutation = useMutation({
     mutationFn: ({ variableId, ...values }: LinkVariableInput) =>
       post(variableId ? `/admin/link-variables/${variableId}` : '/admin/link-variables', values),
-    onSuccess: (variable: LinkVariable) => {
-      setUpdatedVariables(variables => ({ ...variables, [variable.id]: variable }));
-      setAddedVariables(variables =>
-        variables.some(item => item.id === variable.id) ? variables : [...variables, variable],
+    onSuccess: async (saved: LinkVariable) => {
+      await queryClient.cancelQueries({ queryKey: ['link-variables'] });
+      queryClient.setQueriesData<LinkVariable[]>({ queryKey: ['link-variables'] }, previous =>
+        previous ? [...previous.filter(item => item.id !== saved.id), saved] : previous,
       );
-      touch('link-variables');
       setEditing(null);
+      await refresh();
     },
   });
   const deleteMutation = useMutation({
     mutationFn: (variableId: string) => del(`/admin/link-variables/${variableId}`),
-    onSuccess: (_: unknown, variableId: string) => {
-      setRemovedVariableIds(ids => [...ids, variableId]);
-      touch('link-variables');
+    onSuccess: async (_: unknown, variableId: string) => {
+      await queryClient.cancelQueries({ queryKey: ['link-variables'] });
+      queryClient.setQueriesData<LinkVariable[]>({ queryKey: ['link-variables'] }, previous =>
+        previous?.filter(item => item.id !== variableId),
+      );
+      setDeleting(null);
+      await refresh();
     },
   });
 
-  const fetchedVariables = (data || []) as LinkVariable[];
-  const variables = sortLinkVariables(
-    [
-      ...fetchedVariables,
-      ...addedVariables.filter(variable => !fetchedVariables.some(item => item.id === variable.id)),
-    ]
-      .filter(variable => !removedVariableIds.includes(variable.id))
-      .map(variable => updatedVariables[variable.id] || variable),
-    sort,
-  );
-
+  const variables = sortLinkVariables((data || []) as LinkVariable[], sort);
   const formatDate = (value: string | null) =>
     value && Number.isFinite(Date.parse(value))
       ? formatTimezoneDate(value, 'dd-MM-yyyy HH:mm')
       : '—';
-
   const sortOptions: { id: VariableSort; label: string }[] = [
     { id: 'name-asc', label: labels.variableSortNameAsc },
     { id: 'name-desc', label: labels.variableSortNameDesc },
@@ -117,71 +110,17 @@ export function LinkVariablesManager({ onClose }: { onClose?: () => void }) {
     { id: 'updated-desc', label: labels.variableSortUpdatedDesc },
     { id: 'updated-asc', label: labels.variableSortUpdatedAsc },
   ];
-
   const checkName = (name: string) =>
     !!normalizeLinkVariableName(name) || t(messages.invalidLinkVariableName);
+  const variable = editing && editing !== 'new' ? editing : null;
+  const openEditor = (item: LinkVariable | 'new') => {
+    saveMutation.reset();
+    setEditing(item);
+  };
 
   return (
-    <Column gap="6">
-      <Column gap="1">
-        <Text color="muted">{t(messages.linkVariableHelp)}</Text>
-        <Text color="muted" size="sm">
-          {t(messages.linkVariableExample)}
-        </Text>
-      </Column>
-
-      <Column gap="3">
-        <Heading size="base">{editing ? t(labels.edit) : t(labels.add)}</Heading>
-        <Form
-          key={editing?.id || 'new'}
-          defaultValues={{ name: editing?.name || '', value: editing?.value || '' }}
-          error={getErrorMessage(saveMutation.error)}
-          mode="onChange"
-          onSubmit={(values: LinkVariableInput) =>
-            saveMutation.mutateAsync({ variableId: editing?.id, ...values })
-          }
-        >
-          <Row gap="3" alignItems="flex-end">
-            <FormField
-              label={t(labels.name)}
-              name="name"
-              rules={{ required: t(labels.required), validate: checkName }}
-              style={{ flex: 1 }}
-            >
-              <TextField
-                placeholder="whatsapp_token"
-                autoComplete="off"
-                isReadOnly={!!editing && !user.isAdmin}
-              />
-            </FormField>
-            <FormField
-              label={t(labels.value)}
-              name="value"
-              rules={{ required: t(labels.required) }}
-              style={{ flex: 2 }}
-            >
-              <TextField autoComplete="off" />
-            </FormField>
-            <Row gap="2" paddingBottom="1">
-              {editing && (
-                <Button variant="quiet" onPress={() => setEditing(null)}>
-                  {t(labels.cancel)}
-                </Button>
-              )}
-              <FormSubmitButton isLoading={saveMutation.isPending} requireValid>
-                <Icon>{editing ? <Edit /> : <Plus />}</Icon>
-                {editing ? t(labels.save) : t(labels.add)}
-              </FormSubmitButton>
-            </Row>
-          </Row>
-        </Form>
-      </Column>
-
-      <Column gap="3">
-        <Row alignItems="center" justifyContent="space-between">
-          <Heading size="base">{t(labels.variables)}</Heading>
-          {!isLoading && !error && <Text color="muted">{variables.length}</Text>}
-        </Row>
+    <Column gap="4">
+      <Row alignItems="center" justifyContent="space-between" gap="3" wrap="wrap">
         <Select
           value={sort}
           onChange={value => {
@@ -195,65 +134,186 @@ export function LinkVariablesManager({ onClose }: { onClose?: () => void }) {
             </ListItem>
           ))}
         </Select>
-        {isLoading ? (
-          <p className="text-sm text-muted">{t(labels.loading)}</p>
-        ) : error ? (
-          <p className="text-sm text-error">{getErrorMessage(error)}</p>
-        ) : variables.length === 0 ? (
-          <p className="text-sm text-muted">{t(labels.none)}</p>
-        ) : (
-          <Column gap="2" overflowY="auto" maxHeight="min(360px, 35dvh)">
-            {variables.map(variable => (
-              <Row
-                key={variable.id}
-                alignItems="center"
-                gap="3"
-                paddingY="2"
-                paddingX="3"
-                border
-                borderRadius
-                backgroundColor="surface-raised"
+        <Row gap="2" alignItems="center">
+          <DialogButton
+            label={t(labels.variableExample)}
+            title={t(labels.variableExample)}
+            variant="quiet"
+            width="520px"
+          >
+            {({ close }) => (
+              <Column gap="3">
+                <Text>{t(messages.variableExampleIntro)}</Text>
+                <pre className="whitespace-pre-wrap break-all rounded bg-muted p-3">
+                  {'enlace = https://example.com/contacto\n' + '$' + '{enlace}?origen=campana'}
+                </pre>
+                <Text color="muted" size="sm">
+                  {t(messages.variableExampleResult)}
+                </Text>
+                <Row justifyContent="flex-end">
+                  <Button onPress={close}>{t(labels.close)}</Button>
+                </Row>
+              </Column>
+            )}
+          </DialogButton>
+          <Button variant="primary" onPress={() => openEditor('new')}>
+            <Icon>
+              <Plus />
+            </Icon>
+            {t(labels.add)}
+          </Button>
+        </Row>
+      </Row>
+      {isLoading ? (
+        <p className="text-sm text-muted">{t(labels.loading)}</p>
+      ) : error ? (
+        <p className="text-sm text-error">{getErrorMessage(error)}</p>
+      ) : variables.length === 0 ? (
+        <p className="text-sm text-muted">{t(labels.none)}</p>
+      ) : (
+        <div style={{ overflowX: 'auto', width: '100%' }}>
+          <table className="w-full text-sm" style={{ minWidth: 720, tableLayout: 'fixed' }}>
+            <thead>
+              <tr className="border-b text-left">
+                <th className="p-3" style={{ width: '20%' }} scope="col">
+                  {t(labels.name)}
+                </th>
+                <th className="p-3" style={{ width: '34%' }} scope="col">
+                  {t(labels.value)}
+                </th>
+                <th className="p-3" style={{ width: '17%' }} scope="col">
+                  {t(labels.created)}
+                </th>
+                <th className="p-3" style={{ width: '17%' }} scope="col">
+                  {t(labels.updated)}
+                </th>
+                <th className="p-3" style={{ width: '12%' }} scope="col">
+                  <span className="sr-only">{t(labels.actions)}</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {variables.map(item => (
+                <tr key={item.id} className="border-b">
+                  <td className="p-3">
+                    <span className="block truncate">{item.name}</span>
+                  </td>
+                  <td className="p-3">
+                    <span className="block truncate">{item.value}</span>
+                  </td>
+                  <td className="p-3 whitespace-nowrap">{formatDate(item.createdAt)}</td>
+                  <td className="p-3 whitespace-nowrap">{formatDate(item.updatedAt)}</td>
+                  <td className="p-3">
+                    <Row gap="2">
+                      <Button
+                        variant="quiet"
+                        aria-label={`${t(labels.edit)} ${item.name}`}
+                        isDisabled={saveMutation.isPending || deleteMutation.isPending}
+                        onPress={() => openEditor(item)}
+                      >
+                        <Icon>
+                          <Edit />
+                        </Icon>
+                      </Button>
+                      <Button
+                        variant="quiet"
+                        aria-label={`${t(labels.delete)} ${item.name}`}
+                        isDisabled={saveMutation.isPending || deleteMutation.isPending}
+                        onPress={() => {
+                          deleteMutation.reset();
+                          setDeleting(item);
+                        }}
+                      >
+                        <Icon>
+                          <Trash />
+                        </Icon>
+                      </Button>
+                    </Row>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+      <DialogButton
+        isOpen={editing !== null}
+        onOpenChange={open => {
+          if (!open && !saveMutation.isPending) setEditing(null);
+        }}
+        title={variable ? t(labels.edit) : t(labels.add)}
+        width="600px"
+      >
+        {() => (
+          <Form
+            key={variable?.id || 'new'}
+            defaultValues={{ name: variable?.name || '', value: variable?.value || '' }}
+            error={getErrorMessage(saveMutation.error)}
+            mode="onChange"
+            onSubmit={(values: LinkVariableInput) =>
+              saveMutation.mutateAsync({ variableId: variable?.id, ...values })
+            }
+          >
+            <Column gap="3">
+              <FormField
+                label={t(labels.name)}
+                name="name"
+                rules={{ required: t(labels.required), validate: checkName }}
               >
-                <Column gap="0" style={{ flex: 1, minWidth: 0 }}>
-                  <Text weight="medium">{variable.name}</Text>
-                  <Text color="muted" size="sm" truncate>
-                    {variable.value}
-                  </Text>
-                  <Text color="muted" size="sm">
-                    {t(labels.created)}: {formatDate(variable.createdAt)}
-                  </Text>
-                  <Text color="muted" size="sm">
-                    {t(labels.updated)}: {formatDate(variable.updatedAt)}
-                  </Text>
-                </Column>
-                <Button
-                  variant="quiet"
-                  aria-label={t(labels.edit)}
-                  isDisabled={saveMutation.isPending || deleteMutation.isPending}
-                  onPress={() => setEditing(variable)}
-                >
-                  <Icon>
-                    <Edit />
-                  </Icon>
+                <TextField
+                  placeholder="enlace"
+                  autoComplete="off"
+                  isReadOnly={!!variable && !user.isAdmin}
+                />
+              </FormField>
+              <FormField
+                label={t(labels.value)}
+                name="value"
+                rules={{ required: t(labels.required) }}
+              >
+                <TextField autoComplete="off" />
+              </FormField>
+              <Row gap="2" justifyContent="flex-end">
+                <Button isDisabled={saveMutation.isPending} onPress={() => setEditing(null)}>
+                  {t(labels.cancel)}
                 </Button>
-                <Button
-                  variant="quiet"
-                  aria-label={t(labels.delete)}
-                  isDisabled={deleteMutation.isPending || saveMutation.isPending}
-                  onPress={() => deleteMutation.mutateAsync(variable.id)}
-                >
-                  <Icon>
-                    <Trash />
-                  </Icon>
-                </Button>
+                <FormSubmitButton isLoading={saveMutation.isPending} requireValid>
+                  {variable ? t(labels.save) : t(labels.add)}
+                </FormSubmitButton>
               </Row>
-            ))}
-          </Column>
+            </Column>
+          </Form>
         )}
-      </Column>
-
+      </DialogButton>
+      <DialogButton
+        isOpen={!!deleting}
+        onOpenChange={open => {
+          if (!open && !deleteMutation.isPending) setDeleting(null);
+        }}
+        title={t(labels.delete)}
+        width="440px"
+      >
+        {() => (
+          <ConfirmationForm
+            message={
+              <Column gap="2">
+                <Text>{t(messages.variableDeleteConfirm, { name: deleting?.name || '' })}</Text>
+                <Text color="muted" size="sm">
+                  {t(messages.variableDeleteWarning)}
+                </Text>
+              </Column>
+            }
+            buttonLabel={t(labels.delete)}
+            buttonVariant="danger"
+            isLoading={deleteMutation.isPending}
+            error={getErrorMessage(deleteMutation.error)}
+            onConfirm={() => deleting && deleteMutation.mutateAsync(deleting.id)}
+            onClose={() => setDeleting(null)}
+          />
+        )}
+      </DialogButton>
       {onClose && (
-        <Row justifyContent="flex-end" paddingTop="2">
+        <Row justifyContent="flex-end">
           <Button variant="quiet" onPress={onClose}>
             {t(labels.close)}
           </Button>

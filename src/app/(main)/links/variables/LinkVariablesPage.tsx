@@ -11,7 +11,7 @@ import { canAccessLinkVariables } from '@/lib/link-variables';
 
 export function LinkVariablesPage() {
   const { user } = useLoginQuery();
-  const { t, labels, messages } = useMessages();
+  const { t, labels } = useMessages();
   const { renderUrl } = useNavigation();
 
   if (!canAccessLinkVariables(user)) {
@@ -21,7 +21,7 @@ export function LinkVariablesPage() {
   return (
     <PageBody maxWidth="1320px">
       <Column gap="6" margin="2">
-        <PageHeader title={t(labels.variables)} description={t(messages.linkVariableHelp)}>
+        <PageHeader title={t(labels.variables)}>
           <LinkButton href={renderUrl('/links', false)} variant="quiet">
             <Icon>
               <ArrowLeft />

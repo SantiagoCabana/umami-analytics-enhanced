@@ -4,7 +4,7 @@ import { ROLES } from '@/lib/constants';
 import { render, screen } from '@/test/render';
 import { LinkVariablesButton, LinkVariablesManager } from './LinkVariablesButton';
 
-const state = vi.hoisted(() => ({ role: 'user', query: vi.fn() }));
+const state = vi.hoisted(() => ({ role: 'user', query: vi.fn(), post: vi.fn(), del: vi.fn() }));
 
 vi.mock('@/components/hooks', async () => {
   const { useMessages } = await import('@/components/hooks/useMessages');
@@ -16,16 +16,19 @@ vi.mock('@/components/hooks', async () => {
     useMessages,
     useLocale,
     useNavigation,
+    useMobile: () => ({ isMobile: false }),
     useTimezone: () => ({ formatTimezoneDate: (date: string) => `formatted ${date}` }),
     useLoginQuery: () => ({ user: { role: state.role, isAdmin: state.role === ROLES.admin } }),
     useLinkVariablesQuery: () => state.query(),
     useModified: () => ({ touch: vi.fn() }),
-    useApi: () => ({ post: vi.fn(), del: vi.fn(), useMutation }),
+    useApi: () => ({ post: state.post, del: state.del, useMutation }),
   };
 });
 
 beforeEach(() => {
   state.role = ROLES.user;
+  state.post.mockReset();
+  state.del.mockReset();
   state.query.mockReset().mockReturnValue({
     data: [
       {
@@ -44,8 +47,9 @@ beforeEach(() => {
 test('shows creation and missing update dates', () => {
   render(<LinkVariablesManager />);
 
-  expect(screen.getByText('Created: formatted 2026-10-01T00:00:00.000Z')).toBeInTheDocument();
-  expect(screen.getByText('Updated: —')).toBeInTheDocument();
+  expect(screen.getByText('formatted 2026-10-01T00:00:00.000Z')).toBeInTheDocument();
+  expect(screen.getByText('—')).toBeInTheDocument();
+  expect(screen.getByRole('table')).toBeInTheDocument();
 });
 
 test('offers the accessible variable sort control and changes the displayed order', async () => {
@@ -64,7 +68,7 @@ test('offers the accessible variable sort control and changes the displayed orde
     screen.getByText('alpha').compareDocumentPosition(screen.getByText('zulu')) &
       Node.DOCUMENT_POSITION_FOLLOWING,
   ).toBeTruthy();
-  expect(screen.getAllByText('Updated: —')).toHaveLength(2);
+  expect(screen.getAllByText('—')).toHaveLength(4);
   await user.click(sort);
   await user.click(await screen.findByRole('option', { name: 'Name: Z–A' }));
   expect(
@@ -106,8 +110,10 @@ test.each([ROLES.admin, ROLES.user])('%s can create, but only admins can rename'
   state.role = role;
   const { user } = render(<LinkVariablesManager />);
 
-  expect(screen.getByRole('textbox', { name: 'Name' })).not.toHaveAttribute('readonly');
-  await user.click(screen.getByRole('button', { name: 'Edit' }));
+  await user.click(screen.getByRole('button', { name: 'Add' }));
+  expect(await screen.findByRole('textbox', { name: 'Name' })).not.toHaveAttribute('readonly');
+  await user.click(screen.getByRole('button', { name: 'Cancel' }));
+  await user.click(screen.getByRole('button', { name: 'Edit campaign' }));
 
   expect(screen.getByRole('textbox', { name: 'Name' })).toHaveValue('campaign');
   expect(screen.getByRole('textbox', { name: 'Name' })).toHaveProperty(
@@ -115,5 +121,24 @@ test.each([ROLES.admin, ROLES.user])('%s can create, but only admins can rename'
     role !== ROLES.admin,
   );
   expect(screen.getByRole('textbox', { name: 'Value' })).not.toHaveAttribute('readonly');
-  expect(screen.getByRole('button', { name: 'Delete' })).toBeEnabled();
+  await user.click(screen.getByRole('button', { name: 'Cancel' }));
+  expect(screen.getByRole('button', { name: 'Delete campaign' })).toBeEnabled();
+});
+
+test('asks for confirmation before deleting', async () => {
+  const { user } = render(<LinkVariablesManager />);
+  await user.click(screen.getByRole('button', { name: 'Delete campaign' }));
+  expect(await screen.findByText('Delete variable campaign?')).toBeInTheDocument();
+  expect(
+    screen.getByText('Links using this variable may no longer redirect correctly.'),
+  ).toBeInTheDocument();
+  await user.click(screen.getByRole('button', { name: 'Cancel' }));
+  expect(state.del).not.toHaveBeenCalled();
+  expect(screen.getByRole('button', { name: 'Delete campaign' })).toBeInTheDocument();
+});
+
+test('shows a fictional usage example in a dialog', async () => {
+  const { user } = render(<LinkVariablesManager />);
+  await user.click(screen.getByRole('button', { name: 'Example' }));
+  expect(await screen.findByText(/\$\{enlace\}\?origen=campana/)).toBeInTheDocument();
 });

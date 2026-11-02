@@ -2,6 +2,8 @@ import { useQueryClient } from '@tanstack/react-query';
 import {
   Button,
   Column,
+  DataColumn,
+  DataTable,
   Form,
   FormField,
   FormSubmitButton,
@@ -98,10 +100,8 @@ export function LinkVariablesManager({ onClose }: { onClose?: () => void }) {
   });
 
   const variables = sortLinkVariables((data || []) as LinkVariable[], sort);
-  const formatDate = (value: string | null) =>
-    value && Number.isFinite(Date.parse(value))
-      ? formatTimezoneDate(value, 'dd-MM-yyyy HH:mm')
-      : '—';
+  const formatDate = (value: string | null, format: string) =>
+    value && Number.isFinite(Date.parse(value)) ? formatTimezoneDate(value, format) : '—';
   const sortOptions: { id: VariableSort; label: string }[] = [
     { id: 'name-asc', label: labels.variableSortNameAsc },
     { id: 'name-desc', label: labels.variableSortNameDesc },
@@ -172,68 +172,79 @@ export function LinkVariablesManager({ onClose }: { onClose?: () => void }) {
         <p className="text-sm text-muted">{t(labels.none)}</p>
       ) : (
         <div style={{ overflowX: 'auto', width: '100%' }}>
-          <table className="w-full text-sm" style={{ minWidth: 720, tableLayout: 'fixed' }}>
-            <thead>
-              <tr className="border-b text-left">
-                <th className="p-3" style={{ width: '20%' }} scope="col">
-                  {t(labels.name)}
-                </th>
-                <th className="p-3" style={{ width: '34%' }} scope="col">
-                  {t(labels.value)}
-                </th>
-                <th className="p-3" style={{ width: '17%' }} scope="col">
-                  {t(labels.created)}
-                </th>
-                <th className="p-3" style={{ width: '17%' }} scope="col">
-                  {t(labels.updated)}
-                </th>
-                <th className="p-3" style={{ width: '12%' }} scope="col">
-                  <span className="sr-only">{t(labels.actions)}</span>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {variables.map(item => (
-                <tr key={item.id} className="border-b">
-                  <td className="p-3">
-                    <span className="block truncate">{item.name}</span>
-                  </td>
-                  <td className="p-3">
-                    <span className="block truncate">{item.value}</span>
-                  </td>
-                  <td className="p-3 whitespace-nowrap">{formatDate(item.createdAt)}</td>
-                  <td className="p-3 whitespace-nowrap">{formatDate(item.updatedAt)}</td>
-                  <td className="p-3">
-                    <Row gap="2">
-                      <Button
-                        variant="quiet"
-                        aria-label={`${t(labels.edit)} ${item.name}`}
-                        isDisabled={saveMutation.isPending || deleteMutation.isPending}
-                        onPress={() => openEditor(item)}
-                      >
-                        <Icon>
-                          <Edit />
-                        </Icon>
-                      </Button>
-                      <Button
-                        variant="quiet"
-                        aria-label={`${t(labels.delete)} ${item.name}`}
-                        isDisabled={saveMutation.isPending || deleteMutation.isPending}
-                        onPress={() => {
-                          deleteMutation.reset();
-                          setDeleting(item);
-                        }}
-                      >
-                        <Icon>
-                          <Trash />
-                        </Icon>
-                      </Button>
-                    </Row>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <DataTable data={variables} style={{ minWidth: 720 }}>
+            <DataColumn
+              id="name"
+              label={t(labels.name)}
+              width="1fr"
+              style={{ minWidth: 0 }}
+              className="items-center"
+            >
+              {(item: LinkVariable) => <Text truncate>{item.name}</Text>}
+            </DataColumn>
+            <DataColumn
+              id="value"
+              label={t(labels.value)}
+              width="2fr"
+              style={{ minWidth: 0 }}
+              className="items-center"
+            >
+              {(item: LinkVariable) => <Text truncate>{item.value}</Text>}
+            </DataColumn>
+            <DataColumn
+              id="created"
+              label={t(labels.created)}
+              width="120px"
+              className="items-center"
+            >
+              {(item: LinkVariable) => <Text>{formatDate(item.createdAt, 'dd-MM-yyyy')}</Text>}
+            </DataColumn>
+            <DataColumn
+              id="updated"
+              label={t(labels.updated)}
+              width="160px"
+              className="items-center"
+            >
+              {(item: LinkVariable) => (
+                <Text>{formatDate(item.updatedAt, 'dd-MM-yyyy HH:mm')}</Text>
+              )}
+            </DataColumn>
+            <DataColumn
+              id="actions"
+              label={<span className="sr-only">{t(labels.actions)}</span>}
+              width="72px"
+              align="end"
+              className="items-center"
+            >
+              {(item: LinkVariable) => (
+                <Row gap="2">
+                  <Button
+                    variant="quiet"
+                    aria-label={`${t(labels.edit)} ${item.name}`}
+                    isDisabled={saveMutation.isPending || deleteMutation.isPending}
+                    onPress={() => openEditor(item)}
+                  >
+                    <Icon>
+                      <Edit />
+                    </Icon>
+                  </Button>
+                  <Button
+                    variant="quiet"
+                    aria-label={`${t(labels.delete)} ${item.name}`}
+                    isDisabled={saveMutation.isPending || deleteMutation.isPending}
+                    onPress={() => {
+                      deleteMutation.reset();
+                      setDeleting(item);
+                    }}
+                  >
+                    <Icon>
+                      <Trash />
+                    </Icon>
+                  </Button>
+                </Row>
+              )}
+            </DataColumn>
+          </DataTable>
         </div>
       )}
       <DialogButton

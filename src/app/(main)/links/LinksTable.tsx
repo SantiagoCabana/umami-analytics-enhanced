@@ -1,7 +1,6 @@
 import { DataColumn, DataTable, type DataTableProps, Row, Text } from '@umami/react-zen';
 import { useMemo } from 'react';
 import { WebsiteSparkline } from '@/app/(main)/websites/WebsiteSparkline';
-import { DateDistance } from '@/components/common/DateDistance';
 import { ExternalLink } from '@/components/common/ExternalLink';
 import Link from '@/components/common/Link';
 import { SortableLabel } from '@/components/common/SortableLabel';
@@ -32,6 +31,8 @@ export function LinksTable({
   const chartsQuery = useLinkListChartsQuery(linkIds);
   const charts = chartsQuery.data?.data || {};
   const isChartLoading = chartsQuery.isLoading && !chartsQuery.data;
+  const formatDate = (value: string | null, format: string) =>
+    value && Number.isFinite(Date.parse(value)) ? formatTimezoneDate(value, format) : '—';
 
   return (
     <DataTable {...props} data={data}>
@@ -104,23 +105,17 @@ export function LinksTable({
         width="150px"
         className="items-center"
       >
-        {(row: any) => (
-          <Text title={formatTimezoneDate(row.createdAt, 'PPPpp')}>
-            {formatTimezoneDate(row.createdAt, 'dd-MM-yyyy')}
-          </Text>
-        )}
+        {(row: any) => <Text>{formatDate(row.createdAt, 'dd-MM-yyyy')}</Text>}
       </DataColumn>
       <DataColumn
         id="updated"
         label={
           <SortableLabel label={t(labels.updated)} sortKey="updatedAt" defaultDirection="desc" />
         }
-        width="150px"
+        width="160px"
         className="items-center"
       >
-        {(row: any) =>
-          row.updatedAt ? <DateDistance date={new Date(row.updatedAt)} strict /> : <span>-</span>
-        }
+        {(row: any) => <Text>{formatDate(row.updatedAt, 'dd-MM-yyyy HH:mm')}</Text>}
       </DataColumn>
       {showActions && (
         <DataColumn id="action" align="end" width="72px" className="items-center">

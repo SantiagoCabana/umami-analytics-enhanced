@@ -17,7 +17,9 @@ vi.mock('@/components/hooks', async () => {
     useLocale,
     useNavigation,
     useMobile: () => ({ isMobile: false }),
-    useTimezone: () => ({ formatTimezoneDate: (date: string) => `formatted ${date}` }),
+    useTimezone: () => ({
+      formatTimezoneDate: (date: string, format: string) => `${format}: ${date}`,
+    }),
     useLoginQuery: () => ({ user: { role: state.role, isAdmin: state.role === ROLES.admin } }),
     useLinkVariablesQuery: () => state.query(),
     useModified: () => ({ touch: vi.fn() }),
@@ -47,9 +49,27 @@ beforeEach(() => {
 test('shows creation and missing update dates', () => {
   render(<LinkVariablesManager />);
 
-  expect(screen.getByText('formatted 2026-10-01T00:00:00.000Z')).toBeInTheDocument();
+  expect(screen.getByText('dd-MM-yyyy: 2026-10-01T00:00:00.000Z')).toBeInTheDocument();
   expect(screen.getByText('—')).toBeInTheDocument();
   expect(screen.getByRole('table')).toBeInTheDocument();
+});
+
+test('shows the exact update date with hours and minutes', () => {
+  state.query.mockReturnValue({
+    data: [
+      {
+        id: '1',
+        name: 'campaign',
+        value: 'Summer',
+        createdAt: null,
+        updatedAt: '2026-11-02T15:42:00.000Z',
+      },
+    ],
+    isLoading: false,
+    error: null,
+  });
+  render(<LinkVariablesManager />);
+  expect(screen.getByText('dd-MM-yyyy HH:mm: 2026-11-02T15:42:00.000Z')).toBeInTheDocument();
 });
 
 test('offers the accessible variable sort control and changes the displayed order', async () => {

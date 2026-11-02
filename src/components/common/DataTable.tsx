@@ -24,18 +24,26 @@ export function DataTable(props: DataTableProps) {
         const parent = node.parentElement;
         const style = getComputedStyle(parent);
         const nodeRect = node.getBoundingClientRect();
+        const nodeStyle = getComputedStyle(node);
+        reserved += Number.parseFloat(nodeStyle.marginBottom) || 0;
         reserved += Number.parseFloat(style.paddingBottom) || 0;
+        reserved += Number.parseFloat(style.borderBottomWidth) || 0;
         for (const sibling of Array.from(parent.children)) {
           if (sibling === node || !(node.compareDocumentPosition(sibling) & 4)) continue;
           const rect = sibling.getBoundingClientRect();
+          const siblingStyle = getComputedStyle(sibling);
           if (
             rect.height &&
             rect.top >= nodeRect.bottom - 1 &&
             rect.right > nodeRect.left &&
             rect.left < nodeRect.right &&
-            !['fixed', 'absolute'].includes(getComputedStyle(sibling).position)
+            !['fixed', 'absolute'].includes(siblingStyle.position)
           ) {
-            reserved += rect.height + (Number.parseFloat(style.rowGap) || 0);
+            reserved +=
+              rect.height +
+              (Number.parseFloat(style.rowGap) || 0) +
+              (Number.parseFloat(siblingStyle.marginTop) || 0) +
+              (Number.parseFloat(siblingStyle.marginBottom) || 0);
           }
         }
         if (parent.getAttribute('role') === 'dialog') {
@@ -43,6 +51,13 @@ export function DataTable(props: DataTableProps) {
           // bottom here would create a resize/shrink feedback loop.
           bottom = Math.min(bottom, element.getBoundingClientRect().top + viewportHeight * 0.55);
           break;
+        }
+        if (/(auto|scroll|hidden)/.test(style.overflowY)) {
+          // Work in the scroll owner's unscrolled coordinates. Otherwise a tiny
+          // outer scroll moves the table upward and makes it grow on the next resize.
+          const parentRect = parent.getBoundingClientRect();
+          bottom = Math.min(bottom, parentRect.top + parent.clientTop + parent.clientHeight);
+          reserved += parent.scrollTop;
         }
         node = parent;
       }

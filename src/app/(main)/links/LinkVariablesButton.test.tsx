@@ -16,6 +16,7 @@ vi.mock('@/components/hooks', async () => {
     useMessages,
     useLocale,
     useNavigation,
+    useTimezone: () => ({ formatTimezoneDate: (date: string) => `formatted ${date}` }),
     useLoginQuery: () => ({ user: { role: state.role, isAdmin: state.role === ROLES.admin } }),
     useLinkVariablesQuery: () => state.query(),
     useModified: () => ({ touch: vi.fn() }),
@@ -26,10 +27,50 @@ vi.mock('@/components/hooks', async () => {
 beforeEach(() => {
   state.role = ROLES.user;
   state.query.mockReset().mockReturnValue({
-    data: [{ id: 'variable-1', name: 'campaign', value: 'Summer' }],
+    data: [
+      {
+        id: 'variable-1',
+        name: 'campaign',
+        value: 'Summer',
+        createdAt: '2026-10-01T00:00:00.000Z',
+        updatedAt: null,
+      },
+    ],
     isLoading: false,
     error: null,
   });
+});
+
+test('shows creation and missing update dates', () => {
+  render(<LinkVariablesManager />);
+
+  expect(screen.getByText('Created: formatted 2026-10-01T00:00:00.000Z')).toBeInTheDocument();
+  expect(screen.getByText('Updated: —')).toBeInTheDocument();
+});
+
+test('offers the accessible variable sort control and changes the displayed order', async () => {
+  state.query.mockReturnValue({
+    data: [
+      { id: '2', name: 'zulu', value: 'two', createdAt: null, updatedAt: 'invalid' },
+      { id: '1', name: 'alpha', value: 'one', createdAt: null, updatedAt: null },
+    ],
+    isLoading: false,
+    error: null,
+  });
+  const { user } = render(<LinkVariablesManager />);
+
+  const sort = screen.getByRole('combobox', { name: 'Sort variables' });
+  expect(
+    screen.getByText('alpha').compareDocumentPosition(screen.getByText('zulu')) &
+      Node.DOCUMENT_POSITION_FOLLOWING,
+  ).toBeTruthy();
+  expect(screen.getAllByText('Updated: —')).toHaveLength(2);
+  await user.click(sort);
+  await user.click(await screen.findByRole('option', { name: 'Name: Z–A' }));
+  expect(
+    screen.getByText('zulu').compareDocumentPosition(screen.getByText('alpha')) &
+      Node.DOCUMENT_POSITION_FOLLOWING,
+  ).toBeTruthy();
 });
 
 test.each(['', '/teams/3ba48f46-d24c-44d0-9276-79539c5f58a1'])(

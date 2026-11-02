@@ -6,7 +6,9 @@ import {
   FormSubmitButton,
   Heading,
   Icon,
+  ListItem,
   Row,
+  Select,
   Text,
   TextField,
 } from '@umami/react-zen';
@@ -19,14 +21,18 @@ import {
   useMessages,
   useModified,
   useNavigation,
+  useTimezone,
 } from '@/components/hooks';
 import { Edit, Plus, Trash, Variable } from '@/components/icons';
+import { sortLinkVariables, type VariableSort } from '@/lib/link-variable-sort';
 import { canAccessLinkVariables, normalizeLinkVariableName } from '@/lib/link-variables';
 
 type LinkVariable = {
   id: string;
   name: string;
   value: string;
+  createdAt: string | null;
+  updatedAt: string | null;
 };
 
 type LinkVariableInput = {
@@ -57,6 +63,7 @@ export function LinkVariablesButton() {
 export function LinkVariablesManager({ onClose }: { onClose?: () => void }) {
   const { t, labels, messages, getErrorMessage } = useMessages();
   const { user } = useLoginQuery();
+  const { formatTimezoneDate } = useTimezone();
   const { post, del, useMutation } = useApi();
   const { touch } = useModified();
   const { data, isLoading, error } = useLinkVariablesQuery();
@@ -64,6 +71,7 @@ export function LinkVariablesManager({ onClose }: { onClose?: () => void }) {
   const [addedVariables, setAddedVariables] = useState<LinkVariable[]>([]);
   const [updatedVariables, setUpdatedVariables] = useState<Record<string, LinkVariable>>({});
   const [removedVariableIds, setRemovedVariableIds] = useState<string[]>([]);
+  const [sort, setSort] = useState<VariableSort>('name-asc');
 
   const saveMutation = useMutation({
     mutationFn: ({ variableId, ...values }: LinkVariableInput) =>
@@ -86,12 +94,29 @@ export function LinkVariablesManager({ onClose }: { onClose?: () => void }) {
   });
 
   const fetchedVariables = (data || []) as LinkVariable[];
-  const variables = [
-    ...fetchedVariables,
-    ...addedVariables.filter(variable => !fetchedVariables.some(item => item.id === variable.id)),
-  ]
-    .filter(variable => !removedVariableIds.includes(variable.id))
-    .map(variable => updatedVariables[variable.id] || variable);
+  const variables = sortLinkVariables(
+    [
+      ...fetchedVariables,
+      ...addedVariables.filter(variable => !fetchedVariables.some(item => item.id === variable.id)),
+    ]
+      .filter(variable => !removedVariableIds.includes(variable.id))
+      .map(variable => updatedVariables[variable.id] || variable),
+    sort,
+  );
+
+  const formatDate = (value: string | null) =>
+    value && Number.isFinite(Date.parse(value))
+      ? formatTimezoneDate(value, 'dd-MM-yyyy HH:mm')
+      : '—';
+
+  const sortOptions: { id: VariableSort; label: string }[] = [
+    { id: 'name-asc', label: labels.variableSortNameAsc },
+    { id: 'name-desc', label: labels.variableSortNameDesc },
+    { id: 'created-desc', label: labels.variableSortCreatedDesc },
+    { id: 'created-asc', label: labels.variableSortCreatedAsc },
+    { id: 'updated-desc', label: labels.variableSortUpdatedDesc },
+    { id: 'updated-asc', label: labels.variableSortUpdatedAsc },
+  ];
 
   const checkName = (name: string) =>
     !!normalizeLinkVariableName(name) || t(messages.invalidLinkVariableName);
@@ -157,6 +182,19 @@ export function LinkVariablesManager({ onClose }: { onClose?: () => void }) {
           <Heading size="base">{t(labels.variables)}</Heading>
           {!isLoading && !error && <Text color="muted">{variables.length}</Text>}
         </Row>
+        <Select
+          value={sort}
+          onChange={value => {
+            if (value) setSort(value as VariableSort);
+          }}
+          triggerProps={{ 'aria-label': t(labels.variableSort) }}
+        >
+          {sortOptions.map(option => (
+            <ListItem key={option.id} id={option.id}>
+              {t(option.label)}
+            </ListItem>
+          ))}
+        </Select>
         {isLoading ? (
           <p className="text-sm text-muted">{t(labels.loading)}</p>
         ) : error ? (
@@ -180,6 +218,12 @@ export function LinkVariablesManager({ onClose }: { onClose?: () => void }) {
                   <Text weight="medium">{variable.name}</Text>
                   <Text color="muted" size="sm" truncate>
                     {variable.value}
+                  </Text>
+                  <Text color="muted" size="sm">
+                    {t(labels.created)}: {formatDate(variable.createdAt)}
+                  </Text>
+                  <Text color="muted" size="sm">
+                    {t(labels.updated)}: {formatDate(variable.updatedAt)}
                   </Text>
                 </Column>
                 <Button

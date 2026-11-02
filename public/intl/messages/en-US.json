@@ -1,5 +1,12 @@
 {
   "label": {
+    "variable-sort": "Sort variables",
+    "variable-sort-name-asc": "Name: A–Z",
+    "variable-sort-name-desc": "Name: Z–A",
+    "variable-sort-created-desc": "Created: newest first",
+    "variable-sort-created-asc": "Created: oldest first",
+    "variable-sort-updated-desc": "Updated: newest first",
+    "variable-sort-updated-asc": "Updated: oldest first",
     "access-code": "Access code",
     "account": "Account",
     "action": "Action",

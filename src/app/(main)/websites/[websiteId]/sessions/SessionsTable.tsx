@@ -1,5 +1,6 @@
-import { DataColumn, DataTable, type DataTableProps } from '@umami/react-zen';
+import { DataColumn, type DataTableProps } from '@umami/react-zen';
 import { Avatar } from '@/components/common/Avatar';
+import { DataTable } from '@/components/common/DataTable';
 import { DateDistance } from '@/components/common/DateDistance';
 import Link from '@/components/common/Link';
 import { TypeIcon } from '@/components/common/TypeIcon';

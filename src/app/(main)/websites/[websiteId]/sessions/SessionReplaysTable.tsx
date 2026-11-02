@@ -1,5 +1,6 @@
-import { Button, DataColumn, DataTable, type DataTableProps, Icon } from '@umami/react-zen';
+import { Button, DataColumn, type DataTableProps, Icon } from '@umami/react-zen';
 import { Play } from 'lucide-react';
+import { DataTable } from '@/components/common/DataTable';
 import { DateDistance } from '@/components/common/DateDistance';
 import { useMessages } from '@/components/hooks';
 

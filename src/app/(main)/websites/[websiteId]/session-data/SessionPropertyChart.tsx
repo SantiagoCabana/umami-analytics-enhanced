@@ -1,7 +1,8 @@
 'use client';
-import { Column, DataColumn, DataTable, Grid, Row, Text } from '@umami/react-zen';
+import { Column, DataColumn, Grid, Row, Text } from '@umami/react-zen';
 import { useMemo } from 'react';
 import { DistributionBarChart } from '@/components/charts/DistributionBarChart';
+import { DataTable } from '@/components/common/DataTable';
 import { Empty } from '@/components/common/Empty';
 import { LoadingPanel } from '@/components/common/LoadingPanel';
 import { useMessages, useMobile, useSessionDataActivityStatsQuery } from '@/components/hooks';

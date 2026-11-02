@@ -1,8 +1,9 @@
-import { DataColumn, DataTable, Dialog, Icon, MenuItem, Modal, Row, Text } from '@umami/react-zen';
+import { DataColumn, Dialog, Icon, MenuItem, Modal, Row, Text } from '@umami/react-zen';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { WebsiteDeleteForm } from '@/app/(main)/websites/[websiteId]/settings/WebsiteDeleteForm';
 import { ControlledDialog } from '@/components/common/ControlledDialog';
+import { DataTable } from '@/components/common/DataTable';
 import { DateDistance } from '@/components/common/DateDistance';
 import Link from '@/components/common/Link';
 import { SortableLabel } from '@/components/common/SortableLabel';

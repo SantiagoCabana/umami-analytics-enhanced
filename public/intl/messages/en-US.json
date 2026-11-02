@@ -1,5 +1,7 @@
 {
   "label": {
+    "copied": "Copied",
+    "copy-failed": "Could not copy. Try again.",
     "variable-example": "Example",
     "variable-sort": "Sort variables",
     "variable-sort-name-asc": "Name: A–Z",

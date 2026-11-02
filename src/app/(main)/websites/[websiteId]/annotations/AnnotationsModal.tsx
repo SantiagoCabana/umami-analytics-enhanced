@@ -1,15 +1,7 @@
-import {
-  Button,
-  Column,
-  DataColumn,
-  DataTable,
-  Heading,
-  Loading,
-  Row,
-  Text,
-} from '@umami/react-zen';
+import { Button, Column, DataColumn, Heading, Loading, Row, Text } from '@umami/react-zen';
 import { useState } from 'react';
 import { formatAnnotationDate } from '@/components/charts/ChartAnnotationMarkers';
+import { DataTable } from '@/components/common/DataTable';
 import { Empty } from '@/components/common/Empty';
 import { IconLabel } from '@/components/common/IconLabel';
 import { Pager } from '@/components/common/Pager';

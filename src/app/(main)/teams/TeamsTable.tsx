@@ -1,5 +1,6 @@
-import { DataColumn, DataTable, type DataTableProps } from '@umami/react-zen';
+import { DataColumn, type DataTableProps } from '@umami/react-zen';
 import type { ReactNode } from 'react';
+import { DataTable } from '@/components/common/DataTable';
 import { SortableLabel } from '@/components/common/SortableLabel';
 import { useMessages } from '@/components/hooks';
 import { ROLES } from '@/lib/constants';

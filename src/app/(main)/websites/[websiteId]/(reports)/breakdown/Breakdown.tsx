@@ -1,4 +1,5 @@
-import { Column, DataColumn, DataTable, Text } from '@umami/react-zen';
+import { Column, DataColumn, Text } from '@umami/react-zen';
+import { DataTable } from '@/components/common/DataTable';
 import { LoadingPanel } from '@/components/common/LoadingPanel';
 import { useBreakdownQuery, useFields, useFormat, useMessages } from '@/components/hooks';
 import { formatShortTime } from '@/lib/format';

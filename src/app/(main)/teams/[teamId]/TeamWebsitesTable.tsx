@@ -1,6 +1,7 @@
-import { DataColumn, DataTable, Row } from '@umami/react-zen';
+import { DataColumn, Row } from '@umami/react-zen';
 import { TeamMemberEditButton } from '@/app/(main)/teams/[teamId]/TeamMemberEditButton';
 import { TeamMemberRemoveButton } from '@/app/(main)/teams/[teamId]/TeamMemberRemoveButton';
+import { DataTable } from '@/components/common/DataTable';
 import Link from '@/components/common/Link';
 import { SortableLabel } from '@/components/common/SortableLabel';
 import { useMessages } from '@/components/hooks';

@@ -1,7 +1,8 @@
 'use client';
-import { Column, DataColumn, DataTable, Row, Text } from '@umami/react-zen';
+import { Column, DataColumn, Row, Text } from '@umami/react-zen';
 import { useMemo } from 'react';
 import { Avatar } from '@/components/common/Avatar';
+import { DataTable } from '@/components/common/DataTable';
 import { DateDistance } from '@/components/common/DateDistance';
 import { Empty } from '@/components/common/Empty';
 import Link from '@/components/common/Link';
@@ -88,7 +89,11 @@ export function SessionDataPivotTable({
   );
 
   const renderTable = (displayMode: 'cards' | 'table') => (
-    <DataTable data={tableQuery?.data} style={{ width: '100%' }} displayMode={displayMode}>
+    <DataTable
+      data={tableQuery?.data}
+      style={{ width: '100%', minWidth: displayMode === 'table' ? tableMinWidth : undefined }}
+      displayMode={displayMode}
+    >
       <DataColumn id="session" label={t(labels.session)} width="72px">
         {(row: any) => (
           <Link href={updateParams({ session: row.sessionId })}>
@@ -123,13 +128,7 @@ export function SessionDataPivotTable({
           {isMobile ? (
             renderTable('cards')
           ) : (
-            <div
-              style={{ width: '100%', maxWidth: '100%', overflowX: 'auto', overflowY: 'hidden' }}
-            >
-              <div style={{ width: tableMinWidth, minWidth: tableMinWidth }}>
-                {renderTable('table')}
-              </div>
-            </div>
+            <div style={{ width: '100%', minWidth: 0 }}>{renderTable('table')}</div>
           )}
           {showPager && tableQuery && (
             <Row marginTop="6">

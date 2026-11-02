@@ -1,5 +1,6 @@
-import { DataColumn, DataTable, type DataTableProps, Icon, Text } from '@umami/react-zen';
+import { DataColumn, type DataTableProps, Icon, Text } from '@umami/react-zen';
 import { type ReactNode, useMemo } from 'react';
+import { DataTable } from '@/components/common/DataTable';
 import { LinkButton } from '@/components/common/LinkButton';
 import { SortableLabel } from '@/components/common/SortableLabel';
 import {

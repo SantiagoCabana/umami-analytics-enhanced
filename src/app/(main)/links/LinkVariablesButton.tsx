@@ -3,7 +3,6 @@ import {
   Button,
   Column,
   DataColumn,
-  DataTable,
   Form,
   FormField,
   FormSubmitButton,
@@ -16,6 +15,8 @@ import {
 } from '@umami/react-zen';
 import { useState } from 'react';
 import { ConfirmationForm } from '@/components/common/ConfirmationForm';
+import { CopyButton } from '@/components/common/CopyButton';
+import { DataTable } from '@/components/common/DataTable';
 import { LinkButton } from '@/components/common/LinkButton';
 import {
   useApi,
@@ -170,7 +171,7 @@ export function LinkVariablesManager({ onClose }: { onClose?: () => void }) {
       ) : variables.length === 0 ? (
         <p className="text-sm text-muted">{t(labels.none)}</p>
       ) : (
-        <div style={{ overflowX: 'auto', width: '100%' }}>
+        <div style={{ minWidth: 0, width: '100%' }}>
           <DataTable data={variables} style={{ minWidth: 720 }}>
             <DataColumn
               id="name"
@@ -179,7 +180,15 @@ export function LinkVariablesManager({ onClose }: { onClose?: () => void }) {
               style={{ minWidth: 0 }}
               className="items-center"
             >
-              {(item: LinkVariable) => <Text truncate>{item.name}</Text>}
+              {(item: LinkVariable) => (
+                <Row gap="2" alignItems="center" minWidth="0">
+                  <Text truncate>{item.name}</Text>
+                  <CopyButton
+                    value={`\${${item.name}}`}
+                    label={`${t(labels.copy)} \${${item.name}}`}
+                  />
+                </Row>
+              )}
             </DataColumn>
             <DataColumn
               id="value"

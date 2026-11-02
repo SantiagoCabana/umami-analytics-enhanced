@@ -1,4 +1,5 @@
-import { DataColumn, DataTable, Text } from '@umami/react-zen';
+import { DataColumn, Text } from '@umami/react-zen';
+import { DataTable } from '@/components/common/DataTable';
 import { DateDistance } from '@/components/common/DateDistance';
 import { EmptyPlaceholder } from '@/components/common/EmptyPlaceholder';
 import { LoadingPanel } from '@/components/common/LoadingPanel';

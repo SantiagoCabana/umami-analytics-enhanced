@@ -1,7 +1,6 @@
 import {
   Button,
   DataColumn,
-  DataTable,
   type DataTableProps,
   Dialog,
   DialogTrigger,
@@ -11,6 +10,7 @@ import {
   Text,
 } from '@umami/react-zen';
 import { Avatar } from '@/components/common/Avatar';
+import { DataTable } from '@/components/common/DataTable';
 import { DateDistance } from '@/components/common/DateDistance';
 import { IconLabel } from '@/components/common/IconLabel';
 import Link from '@/components/common/Link';

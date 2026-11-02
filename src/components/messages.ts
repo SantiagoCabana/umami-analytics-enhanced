@@ -460,6 +460,8 @@ export const labels: Record<string, string> = {
   lastUsed: 'label.last-used',
   never: 'label.never',
   copy: 'label.copy',
+  copied: 'label.copied',
+  copyFailed: 'label.copy-failed',
 };
 
 export const messages: Record<string, string> = {

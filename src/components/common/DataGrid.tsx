@@ -133,7 +133,9 @@ export function DataGrid({
         <Row
           alignItems="center"
           gap
-          style={isMobile ? { width: '100%', justifyContent: 'flex-start' } : { marginLeft: 'auto' }}
+          style={
+            isMobile ? { width: '100%', justifyContent: 'flex-start' } : { marginLeft: 'auto' }
+          }
         >
           {renderActions?.()}
           {!isMobile && viewToggleButton}
@@ -151,7 +153,7 @@ export function DataGrid({
             style={{
               display: 'grid',
               gridTemplateColumns: 'minmax(0, 1fr)',
-              overflowX: 'auto',
+              minWidth: 0,
             }}
           >
             <Column>

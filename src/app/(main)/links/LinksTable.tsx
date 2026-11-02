@@ -1,6 +1,7 @@
-import { DataColumn, DataTable, type DataTableProps, Row, Text } from '@umami/react-zen';
+import { DataColumn, type DataTableProps, Row, Text } from '@umami/react-zen';
 import { useMemo } from 'react';
 import { WebsiteSparkline } from '@/app/(main)/websites/WebsiteSparkline';
+import { DataTable } from '@/components/common/DataTable';
 import { ExternalLink } from '@/components/common/ExternalLink';
 import Link from '@/components/common/Link';
 import { SortableLabel } from '@/components/common/SortableLabel';

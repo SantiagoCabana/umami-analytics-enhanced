@@ -1,7 +1,8 @@
 'use client';
-import { Column, DataColumn, DataTable, Row, Text } from '@umami/react-zen';
+import { Column, DataColumn, Row, Text } from '@umami/react-zen';
 import { useMemo } from 'react';
 import { Avatar } from '@/components/common/Avatar';
+import { DataTable } from '@/components/common/DataTable';
 import { DateDistance } from '@/components/common/DateDistance';
 import { Empty } from '@/components/common/Empty';
 import Link from '@/components/common/Link';
@@ -121,31 +122,31 @@ export function EventDataPivotTable({
               </DataColumn>
             </DataTable>
           ) : (
-            <div
-              style={{ width: '100%', maxWidth: '100%', overflowX: 'auto', overflowY: 'hidden' }}
-            >
-              <div style={{ width: tableMinWidth, minWidth: tableMinWidth }}>
-                <DataTable data={tableQuery?.data} style={{ width: '100%' }} displayMode="table">
-                  <DataColumn id="session" label={t(labels.session)} width="72px">
-                    {(row: any) => (
-                      <Link href={updateParams({ session: row.sessionId })}>
-                        <Avatar seed={row.sessionId} size={32} />
-                      </Link>
-                    )}
+            <div style={{ width: '100%', minWidth: 0 }}>
+              <DataTable
+                data={tableQuery?.data}
+                style={{ width: '100%', minWidth: tableMinWidth }}
+                displayMode="table"
+              >
+                <DataColumn id="session" label={t(labels.session)} width="72px">
+                  {(row: any) => (
+                    <Link href={updateParams({ session: row.sessionId })}>
+                      <Avatar seed={row.sessionId} size={32} />
+                    </Link>
+                  )}
+                </DataColumn>
+                <DataColumn id="urlPath" label={t(labels.path)} width="220px">
+                  {(row: any) => renderTruncatedText(row.urlPath ?? '')}
+                </DataColumn>
+                {propertyKeys.map(key => (
+                  <DataColumn key={key} id={key} label={key} width="160px">
+                    {(row: any) => renderTruncatedText(row[key] ?? '')}
                   </DataColumn>
-                  <DataColumn id="urlPath" label={t(labels.path)} width="220px">
-                    {(row: any) => renderTruncatedText(row.urlPath ?? '')}
-                  </DataColumn>
-                  {propertyKeys.map(key => (
-                    <DataColumn key={key} id={key} label={key} width="160px">
-                      {(row: any) => renderTruncatedText(row[key] ?? '')}
-                    </DataColumn>
-                  ))}
-                  <DataColumn id="createdAt" label={t(labels.created)} width="180px">
-                    {(row: any) => <DateDistance date={new Date(row.createdAt)} />}
-                  </DataColumn>
-                </DataTable>
-              </div>
+                ))}
+                <DataColumn id="createdAt" label={t(labels.created)} width="180px">
+                  {(row: any) => <DateDistance date={new Date(row.createdAt)} />}
+                </DataColumn>
+              </DataTable>
             </div>
           )}
           {showPager && tableQuery && (

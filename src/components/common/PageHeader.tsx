@@ -8,6 +8,7 @@ export function PageHeader({
   label,
   icon,
   showBorder = true,
+  compact = false,
   titleHref,
   children,
 }: {
@@ -16,6 +17,7 @@ export function PageHeader({
   label?: ReactNode;
   icon?: ReactNode;
   showBorder?: boolean;
+  compact?: boolean;
   titleHref?: string;
   allowEdit?: boolean;
   className?: string;
@@ -24,8 +26,8 @@ export function PageHeader({
   return (
     <Grid
       columns={{ base: '1fr', md: '1fr 1fr' }}
-      paddingY="6"
-      marginBottom="6"
+      paddingY={compact ? '3' : '6'}
+      marginBottom={compact ? '0' : '6'}
       border={showBorder ? 'bottom' : undefined}
     >
       <Column gap="2">

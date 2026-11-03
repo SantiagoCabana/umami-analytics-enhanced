@@ -12,7 +12,7 @@ export function BoardsPage() {
 
   return (
     <PageBody>
-      <Column margin="2">
+      <Column gap="3" margin="2">
         <PageHeader title={t(labels.boards)}>
           <BoardAddButton />
         </PageHeader>

@@ -17,7 +17,7 @@ export function DomainsPage() {
   const closeDialog = () => setEditedDomain(null);
 
   return (
-    <Column gap="6" margin="2">
+    <Column gap="6">
       <PageHeader title={t(labels.domains)}>
         <Button variant="primary" onPress={() => setEditedDomain('new')}>
           <Icon>

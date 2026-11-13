@@ -20,7 +20,7 @@ export function LinkVariablesPage() {
 
   return (
     <PageBody maxWidth="100%">
-      <Column gap="3" margin="2">
+      <Column gap="3">
         <PageHeader title={t(labels.variables)} compact>
           <LinkButton href={renderUrl('/links', false)} variant="quiet">
             <Icon>

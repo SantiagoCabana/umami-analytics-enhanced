@@ -22,7 +22,7 @@ export function BoardsPage() {
 
   return (
     <PageBody>
-      <Column gap="3" margin="2">
+      <Column gap="3">
         <PageHeader title={t(labels.boards)}>{canCreate && <BoardAddButton />}</PageHeader>
         <Panel>
           <BoardsDataTable />

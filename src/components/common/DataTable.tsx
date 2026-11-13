@@ -1,7 +1,7 @@
 'use client';
 
 import { type DataTableProps, DataTable as ZenDataTable } from '@umami/react-zen';
-import { useLayoutEffect, useRef } from 'react';
+import { type ReactNode, useLayoutEffect, useRef } from 'react';
 import { useMessages } from '@/components/hooks';
 import styles from './DataTable.module.css';
 
@@ -10,6 +10,22 @@ export function DataTable({
   scrollMode = 'viewport',
   ...props
 }: DataTableProps & { scrollMode?: 'viewport' | 'page' }) {
+  return (
+    <TableViewport scrollMode={scrollMode} displayMode={props.displayMode}>
+      <ZenDataTable {...props} />
+    </TableViewport>
+  );
+}
+
+export function TableViewport({
+  children,
+  scrollMode = 'viewport',
+  displayMode,
+}: {
+  children: ReactNode;
+  scrollMode?: 'viewport' | 'page';
+  displayMode?: DataTableProps['displayMode'];
+}) {
   const ref = useRef<HTMLDivElement>(null);
   const { t, labels } = useMessages();
 
@@ -24,7 +40,7 @@ export function DataTable({
     let frame = 0;
     const measure = () => {
       const viewportHeight = window.visualViewport?.height || window.innerHeight;
-      let bottom = viewportHeight - 24;
+      let bottom = viewportHeight;
       let reserved = 0;
       let node: HTMLElement = element;
       // Reserve controls below the table and respect a containing modal's bounds.
@@ -60,7 +76,7 @@ export function DataTable({
           bottom = Math.min(bottom, element.getBoundingClientRect().top + viewportHeight * 0.55);
           break;
         }
-        if (/(auto|scroll|hidden)/.test(style.overflowY)) {
+        if (/(auto|scroll)/.test(style.overflowY)) {
           // Work in the scroll owner's unscrolled coordinates. Otherwise a tiny
           // outer scroll moves the table upward and makes it grow on the next resize.
           const parentRect = parent.getBoundingClientRect();
@@ -73,7 +89,7 @@ export function DataTable({
       // Low-height screens still get a usable scroll area; the page can scroll to it.
       const height = Math.max(Math.min(160, viewportHeight * 0.4), bottom - top - reserved);
       const maxHeight = `${Math.floor(height)}px`;
-      const desiredHeight = props.displayMode === 'cards' ? 'auto' : maxHeight;
+      const desiredHeight = displayMode === 'cards' ? 'auto' : maxHeight;
       if (element.style.maxHeight !== maxHeight) element.style.maxHeight = maxHeight;
       if (element.style.height !== desiredHeight) element.style.height = desiredHeight;
     };
@@ -96,7 +112,7 @@ export function DataTable({
       window.removeEventListener('resize', schedule);
       window.visualViewport?.removeEventListener('resize', schedule);
     };
-  }, [props.displayMode, scrollMode]);
+  }, [displayMode, scrollMode]);
 
   return (
     <div
@@ -106,7 +122,7 @@ export function DataTable({
       aria-label={t(labels.table)}
       tabIndex={0}
     >
-      <ZenDataTable {...props} />
+      {children}
     </div>
   );
 }

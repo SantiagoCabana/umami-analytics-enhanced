@@ -7,6 +7,8 @@ const DEFAULT_WIDTH = '100%';
 
 export function PageBody({
   maxWidth = DEFAULT_WIDTH,
+  paddingBottom = '0',
+  paddingX = '0',
   error,
   isLoading,
   children,
@@ -35,9 +37,9 @@ export function PageBody({
     <Column
       {...props}
       width="100%"
-      paddingBottom="6"
+      paddingBottom={paddingBottom}
       maxWidth={maxWidth}
-      paddingX={{ base: '3', md: '6' }}
+      paddingX={paddingX}
       style={{ margin: '0 auto' }}
     >
       {children}

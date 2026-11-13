@@ -55,13 +55,7 @@ export function HeatmapsPage({ websiteId }: { websiteId: string }) {
   return (
     <Column gap>
       <WebsiteControls websiteId={websiteId} />
-      <Panel
-        minHeight="900px"
-        allowFullscreen
-        minWidth="0"
-        width="100%"
-        style={{ overflow: 'hidden' }}
-      >
+      <Panel minHeight="0" allowFullscreen minWidth="0" width="100%" style={{ overflow: 'hidden' }}>
         <Column gap="5" minWidth="0" width="100%" paddingTop="2">
           <Column gap="4" minWidth="0" width="100%">
             {isPhone ? (

@@ -1,4 +1,4 @@
-import { Icon, Row, Text } from '@umami/react-zen';
+import { Row } from '@umami/react-zen';
 import { Favicon } from '@/components/common/Favicon';
 import { IconLabel } from '@/components/common/IconLabel';
 import { LinkButton } from '@/components/common/LinkButton';
@@ -26,6 +26,7 @@ export function WebsiteHeader({
 
   return (
     <PageHeader
+      className="pl-2"
       title={website.name}
       icon={<Favicon domain={website.domain} />}
       titleHref={allowLink ? renderUrl(`/websites/${website.id}`, false) : undefined}

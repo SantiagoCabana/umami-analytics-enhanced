@@ -4,12 +4,16 @@ import { WebsiteChart } from '@/app/(main)/websites/[websiteId]/WebsiteChart';
 import { WebsiteControls } from '@/app/(main)/websites/[websiteId]/WebsiteControls';
 import { WebsiteMetricsBar } from '@/app/(main)/websites/[websiteId]/WebsiteMetricsBar';
 import { Panel } from '@/components/common/Panel';
-import { CompareTables } from './CompareTables';
+import { CompareTables, CompareViewSelect } from './CompareTables';
 
 export function ComparePage({ websiteId }: { websiteId: string }) {
   return (
     <Column gap>
-      <WebsiteControls websiteId={websiteId} allowCompare={true} />
+      <WebsiteControls
+        websiteId={websiteId}
+        allowCompare={true}
+        extraActions={<CompareViewSelect />}
+      />
       <WebsiteMetricsBar websiteId={websiteId} compareMode={true} showChange={true} />
       <Panel minHeight="520px">
         <WebsiteChart websiteId={websiteId} compareMode={true} />

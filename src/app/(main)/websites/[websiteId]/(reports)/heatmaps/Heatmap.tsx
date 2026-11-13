@@ -122,16 +122,16 @@ export function Heatmap({ websiteId, urlPath, onUrlPathChange, mode, search }: H
 
   if (!isLoading && pages.length === 0) {
     return (
-      <LoadingPanel data={pagesData} isLoading={isLoading} error={error} minHeight="900px">
+      <LoadingPanel data={pagesData} isLoading={isLoading} error={error} minHeight="360px">
         <EmptyState message="No data available." />
       </LoadingPanel>
     );
   }
 
   return (
-    <LoadingPanel data={pagesData} isLoading={isLoading} error={error} minHeight="900px">
+    <LoadingPanel data={pagesData} isLoading={isLoading} error={error} minHeight="360px">
       {isPhone ? (
-        <Column gap="4" minHeight="900px">
+        <Column gap="4" minHeight="360px">
           <Column gap="2" className={styles.mobilePageSection}>
             <Row
               alignItems="center"
@@ -217,7 +217,7 @@ export function Heatmap({ websiteId, urlPath, onUrlPathChange, mode, search }: H
           </ControlledDialog>
         </Column>
       ) : (
-        <Grid columns="320px 12px 1fr" minHeight="900px" className={styles.layoutGrid}>
+        <Grid columns="320px 12px 1fr" minHeight="360px" className={styles.layoutGrid}>
           <PageList
             pages={filteredPages}
             selected={urlPath}

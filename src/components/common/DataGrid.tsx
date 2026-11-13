@@ -20,6 +20,7 @@ import {
   useRef,
   useState,
 } from 'react';
+import { TableViewport } from '@/components/common/DataTable';
 import { Empty } from '@/components/common/Empty';
 import { LoadingPanel } from '@/components/common/LoadingPanel';
 import { Pager } from '@/components/common/Pager';
@@ -164,7 +165,13 @@ export function DataGrid({
         isLoading={isLoading}
         isFetching={isFetching}
         error={error}
-        renderEmpty={renderEmpty}
+        renderEmpty={() => (
+          <TableViewport>
+            <Column height="100%" width="100%" alignItems="center" justifyContent="center">
+              {renderEmpty()}
+            </Column>
+          </TableViewport>
+        )}
       >
         {data && (
           <div

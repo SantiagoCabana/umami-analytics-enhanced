@@ -112,7 +112,7 @@ export function App({ children }) {
       <Column display={{ base: 'none', lg: 'flex' }} minHeight="0" style={{ overflow: 'hidden' }}>
         <SideNav />
       </Column>
-      <Column overflowX="hidden" minHeight="0" position="relative">
+      <Column overflowX="hidden" minHeight="0" position="relative" padding="2">
         <TopNav />
         <Column
           alignItems="center"

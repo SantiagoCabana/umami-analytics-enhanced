@@ -23,7 +23,7 @@ export function AdminSecurityPage() {
   if (isLoading) return null;
 
   return (
-    <Column gap="6" margin="2">
+    <Column gap="6">
       <PageHeader title={t(labels.security)} />
       <Panel>
         <Column gap="4">

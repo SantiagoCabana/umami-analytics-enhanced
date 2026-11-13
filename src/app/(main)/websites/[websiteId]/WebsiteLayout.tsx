@@ -8,7 +8,7 @@ import { WebsiteHeader } from './WebsiteHeader';
 export function WebsiteLayout({ websiteId, children }: { websiteId: string; children: ReactNode }) {
   return (
     <WebsiteProvider websiteId={websiteId}>
-      <PageBody gap>
+      <PageBody gap="2">
         <WebsiteHeader showActions />
         <Column>{children}</Column>
       </PageBody>

@@ -84,3 +84,10 @@ test('copies a URL matching a push that never landed', () => {
 
   expect(search).toHaveValue('shop');
 });
+
+test('keeps an empty result inside the measured content area', () => {
+  renderGrid('/websites');
+  const region = screen.getByRole('region', { name: 'Table' });
+  expect(region.style.height).not.toBe('');
+  expect(region).toHaveTextContent('No data available');
+});

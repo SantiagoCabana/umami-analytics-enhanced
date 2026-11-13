@@ -7,23 +7,13 @@ import { ChangeLabel } from '@/components/metrics/ChangeLabel';
 import { MetricsTable } from '@/components/metrics/MetricsTable';
 import { formatNumber } from '@/lib/format';
 
-export function CompareTables({ websiteId }: { websiteId: string }) {
-  const [data, setData] = useState([]);
-  const { timezone, toUtc } = useTimezone();
-  const { dateRange, dateCompare } = useDateRange({ timezone });
+export function CompareViewSelect() {
   const { t, labels } = useMessages();
   const {
     router,
     updateParams,
     query: { view = 'path' },
   } = useNavigation();
-  const { startDate, endDate } = dateCompare;
-
-  const params = {
-    startAt: +toUtc(startDate),
-    endAt: +toUtc(endDate),
-  };
-
   const renderPath = (view: string) => {
     return updateParams({ view });
   };
@@ -131,11 +121,43 @@ export function CompareTables({ websiteId }: { websiteId: string }) {
     },
   ];
 
+  const handleChange = (id: any) => {
+    router.push(renderPath(id));
+  };
+
+  return (
+    <Row width="200px">
+      <Select
+        triggerProps={{ 'aria-label': t(labels.compare) }}
+        value={view}
+        onChange={handleChange}
+        maxHeight={480}
+        listProps={{ style: { width: 200 } }}
+      >
+        {items.map(({ id, label }) => (
+          <ListItem key={id} id={id}>
+            {label}
+          </ListItem>
+        ))}
+      </Select>
+    </Row>
+  );
+}
+
+export function CompareTables({ websiteId }: { websiteId: string }) {
+  const [data, setData] = useState([]);
+  const { timezone, toUtc } = useTimezone();
+  const { dateRange, dateCompare } = useDateRange({ timezone });
+  const { t, labels } = useMessages();
+  const {
+    query: { view = 'path' },
+  } = useNavigation();
+  const { startDate, endDate } = dateCompare;
+  const params = { startAt: +toUtc(startDate), endAt: +toUtc(endDate) };
   const renderChange = ({ label, count }) => {
     const prev = data.find(d => d.x === label)?.y;
     const value = count - prev;
     const change = Math.abs(((count - prev) / prev) * 100);
-
     return (
       !Number.isNaN(change) && (
         <Row alignItems="center" marginRight="3">
@@ -144,59 +166,37 @@ export function CompareTables({ websiteId }: { websiteId: string }) {
       )
     );
   };
-
-  const handleChange = (id: any) => {
-    router.push(renderPath(id));
-  };
-
   return (
-    <>
-      <Row width="300px">
-        <Select
-          label={t(labels.compare)}
-          value={view}
-          onChange={handleChange}
-          maxHeight={480}
-          listProps={{ style: { width: 200 } }}
-        >
-          {items.map(({ id, label }) => (
-            <ListItem key={id} id={id}>
-              {label}
-            </ListItem>
-          ))}
-        </Select>
-      </Row>
-      <Panel minHeight="300px">
-        <Grid columns={{ base: '1fr', lg: '1fr 1fr' }} gap="6" height="100%">
-          <Column gap="6">
-            <Row alignItems="center" justifyContent="space-between">
-              <Heading size="base">{t(labels.previous)}</Heading>
-              <DateDisplay startDate={startDate} endDate={endDate} />
-            </Row>
-            <MetricsTable
-              websiteId={websiteId}
-              type={view}
-              limit={20}
-              showMore={false}
-              params={params}
-              onDataLoad={setData}
-            />
-          </Column>
-          <Column border="left" paddingLeft="6" gap="6">
-            <Row alignItems="center" justifyContent="space-between">
-              <Heading size="base"> {t(labels.current)}</Heading>
-              <DateDisplay startDate={dateRange.startDate} endDate={dateRange.endDate} />
-            </Row>
-            <MetricsTable
-              websiteId={websiteId}
-              type={view}
-              limit={20}
-              showMore={false}
-              renderChange={renderChange}
-            />
-          </Column>
-        </Grid>
-      </Panel>
-    </>
+    <Panel minHeight="300px">
+      <Grid columns={{ base: '1fr', lg: '1fr 1fr' }} gap="6" height="100%">
+        <Column gap="6">
+          <Row alignItems="center" justifyContent="space-between">
+            <Heading size="base">{t(labels.previous)}</Heading>
+            <DateDisplay startDate={startDate} endDate={endDate} />
+          </Row>
+          <MetricsTable
+            websiteId={websiteId}
+            type={view}
+            limit={20}
+            showMore={false}
+            params={params}
+            onDataLoad={setData}
+          />
+        </Column>
+        <Column border="left" paddingLeft="6" gap="6">
+          <Row alignItems="center" justifyContent="space-between">
+            <Heading size="base"> {t(labels.current)}</Heading>
+            <DateDisplay startDate={dateRange.startDate} endDate={dateRange.endDate} />
+          </Row>
+          <MetricsTable
+            websiteId={websiteId}
+            type={view}
+            limit={20}
+            showMore={false}
+            renderChange={renderChange}
+          />
+        </Column>
+      </Grid>
+    </Panel>
   );
 }

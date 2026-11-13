@@ -11,6 +11,7 @@ export function PageHeader({
   showBorder = true,
   compact = true,
   titleHref,
+  className,
   children,
 }: {
   title: string;
@@ -27,6 +28,7 @@ export function PageHeader({
 }) {
   return (
     <Grid
+      className={className}
       columns={{ base: '1fr', md: '1fr 1fr' }}
       paddingY={compact ? '3' : '6'}
       marginBottom={compact ? '0' : '6'}

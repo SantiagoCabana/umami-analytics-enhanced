@@ -51,6 +51,36 @@ test('reserves pager margins as well as its height', () => {
   }
 });
 
+test('does not use the natural height of a clipping parent as the viewport limit', () => {
+  const rect = vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(() => ({
+    top: 100,
+    bottom: 300,
+    left: 0,
+    right: 800,
+    width: 800,
+    height: 200,
+    x: 0,
+    y: 100,
+    toJSON: () => ({}),
+  }));
+  const height = vi.spyOn(HTMLElement.prototype, 'clientHeight', 'get').mockReturnValue(200);
+  try {
+    render(
+      <div style={{ overflow: 'hidden' }}>
+        <DataTable data={[{ id: 'one', name: 'Campaign' }]}>
+          <DataColumn id="name" label="Name" />
+        </DataTable>
+      </div>,
+    );
+    expect(
+      Number.parseFloat(screen.getByRole('region', { name: 'Table' }).style.height),
+    ).toBeGreaterThan(200);
+  } finally {
+    rect.mockRestore();
+    height.mockRestore();
+  }
+});
+
 test('keeps paging controls outside the keyboard-accessible scroll region', () => {
   render(
     <div>

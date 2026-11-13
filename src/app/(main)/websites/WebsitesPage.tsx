@@ -22,7 +22,7 @@ export function WebsitesPage() {
 
   return (
     <PageBody>
-      <Column gap="3" margin="2">
+      <Column gap="3">
         <PageHeader title={t(labels.websites)}>
           {showActions && user.role !== ROLES.viewOnly && <WebsiteAddButton teamId={teamId} />}
         </PageHeader>

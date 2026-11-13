@@ -26,6 +26,12 @@ export function Retention({ websiteId, days = DAYS, startDate, endDate }: Retent
     endDate,
   });
 
+  const recordsByDate = new Map<string, Map<number, (typeof data)[number]>>();
+  data?.forEach(row => {
+    const records = recordsByDate.get(row.date) ?? new Map();
+    if (!records.has(row.day)) records.set(row.day, row);
+    recordsByDate.set(row.date, records);
+  });
   const rows =
     data?.reduce((arr: any[], row: { date: any; visitors: any; day: any }) => {
       const { date, visitors, day } = row;
@@ -35,9 +41,7 @@ export function Retention({ websiteId, days = DAYS, startDate, endDate }: Retent
           visitors,
           records: days
             .reduce((arr, day) => {
-              arr[day] = data.find(
-                (x: { date: any; day: number }) => x.date === date && x.day === day,
-              );
+              arr[day] = recordsByDate.get(date)?.get(day);
               return arr;
             }, [])
             .filter(n => n),

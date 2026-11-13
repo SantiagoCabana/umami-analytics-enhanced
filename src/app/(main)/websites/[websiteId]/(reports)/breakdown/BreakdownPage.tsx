@@ -1,5 +1,5 @@
 'use client';
-import { Column, Row } from '@umami/react-zen';
+import { Column } from '@umami/react-zen';
 import { useState } from 'react';
 import { FieldSelectForm } from '@/app/(main)/websites/[websiteId]/(reports)/breakdown/FieldSelectForm';
 import { WebsiteControls } from '@/app/(main)/websites/[websiteId]/WebsiteControls';
@@ -22,10 +22,10 @@ export function BreakdownPage({ websiteId }: { websiteId: string }) {
   );
   return (
     <Column gap>
-      <WebsiteControls websiteId={websiteId} />
-      <Row alignItems="center" justifyContent="flex-start">
-        <FieldsButton value={fields} onChange={setFields} />
-      </Row>
+      <WebsiteControls
+        websiteId={websiteId}
+        extraActions={<FieldsButton value={fields} onChange={setFields} />}
+      />
       <Panel
         height="900px"
         overflow="auto"
@@ -33,6 +33,7 @@ export function BreakdownPage({ websiteId }: { websiteId: string }) {
         toolbar={<DownloadButton filename="breakdown" data={data} />}
       >
         <Breakdown
+          key={`${websiteId}:${startDate.getTime()}:${endDate.getTime()}:${fields.join(',')}`}
           websiteId={websiteId}
           startDate={startDate}
           endDate={endDate}

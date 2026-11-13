@@ -42,7 +42,7 @@ export function JourneysPage({ websiteId }: { websiteId: string }) {
   return (
     <Column gap>
       <WebsiteControls websiteId={websiteId} />
-      <Grid columns="repeat(3, 1fr)" gap>
+      <Grid columns={{ base: 'minmax(0, 1fr)', md: 'repeat(3, minmax(0, 1fr))' }} gap>
         <Select
           label={t(labels.steps)}
           value={steps}

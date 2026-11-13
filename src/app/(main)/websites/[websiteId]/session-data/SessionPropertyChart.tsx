@@ -95,37 +95,35 @@ export function SessionPropertyChart({
                   </DataTable>
                 </Column>
               ) : (
-                <Column overflow="auto" minHeight="0">
-                  <Column style={{ minWidth: '700px' }}>
-                    <DataTable data={activeTable}>
-                      <DataColumn
-                        id="label"
-                        label={propertyName}
-                        width="minmax(220px, 2fr)"
-                        align="start"
-                      >
-                        {row => (
-                          <Row overflow="hidden">
-                            <Text truncate style={{ maxWidth: '320px' }}>
-                              {row.label}
-                            </Text>
-                          </Row>
-                        )}
-                      </DataColumn>
-                      <DataColumn id="sessions" label={t(labels.visitors)} align="end" width="90px">
-                        {row => formatLongNumber(row.sessions)}
-                      </DataColumn>
-                      <DataColumn id="visits" label={t(labels.visits)} align="end" width="90px">
-                        {row => formatLongNumber(row.visits)}
-                      </DataColumn>
-                      <DataColumn id="views" label={t(labels.views)} align="end" width="90px">
-                        {row => formatLongNumber(row.views)}
-                      </DataColumn>
-                      <DataColumn id="events" label={t(labels.events)} align="end" width="90px">
-                        {row => formatLongNumber(row.events)}
-                      </DataColumn>
-                    </DataTable>
-                  </Column>
+                <Column minWidth="0" minHeight="0">
+                  <DataTable data={activeTable} style={{ minWidth: '700px' }}>
+                    <DataColumn
+                      id="label"
+                      label={propertyName}
+                      width="minmax(220px, 2fr)"
+                      align="start"
+                    >
+                      {row => (
+                        <Row overflow="hidden">
+                          <Text truncate style={{ maxWidth: '320px' }}>
+                            {row.label}
+                          </Text>
+                        </Row>
+                      )}
+                    </DataColumn>
+                    <DataColumn id="sessions" label={t(labels.visitors)} align="end" width="90px">
+                      {row => formatLongNumber(row.sessions)}
+                    </DataColumn>
+                    <DataColumn id="visits" label={t(labels.visits)} align="end" width="90px">
+                      {row => formatLongNumber(row.visits)}
+                    </DataColumn>
+                    <DataColumn id="views" label={t(labels.views)} align="end" width="90px">
+                      {row => formatLongNumber(row.views)}
+                    </DataColumn>
+                    <DataColumn id="events" label={t(labels.events)} align="end" width="90px">
+                      {row => formatLongNumber(row.events)}
+                    </DataColumn>
+                  </DataTable>
                 </Column>
               )}
             </Column>

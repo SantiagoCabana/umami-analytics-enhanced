@@ -11,14 +11,13 @@ import {
   Row,
   TextField,
 } from '@umami/react-zen';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { MultiSelect, MultiSelectItem } from '@/components/common/MultiSelect';
 import { useApi, useConfig, useLinkQuery, useMessages } from '@/components/hooks';
 import { useUpdateQuery } from '@/components/hooks/queries/useUpdateQuery';
 import { RefreshCw } from '@/components/icons';
 import { getRandomChars } from '@/lib/generate';
 import { isValidLinkDestinationUrl } from '@/lib/link-variables';
-import { setConfig } from '@/store/app';
 
 const generateId = () => getRandomChars(9);
 const DEFAULT_DOMAIN = '__default__';
@@ -43,10 +42,15 @@ export function LinkEditForm({
     },
   );
   const config = useConfig();
-  const { get } = useApi();
+  const { get, useQuery } = useApi();
+  const { data: linkConfig } = useQuery({
+    queryKey: ['link-domains-config'],
+    queryFn: () => get('/config'),
+    staleTime: 0,
+  });
   const cloudMode = config?.cloudMode;
   const baseDomain = config?.baseDomain;
-  const linkDomains = config?.linkDomains || [];
+  const linkDomains: string[] = linkConfig?.linkDomains || [];
   const defaultDomain = baseDomain || globalThis?.location?.hostname || t(labels.defaultDomain);
   const defaultDomainLabel = `https://${defaultDomain}`;
   const hostUrl = baseDomain ? `${defaultDomainLabel}/q` : `${globalThis?.location?.origin}/q`;
@@ -60,12 +64,6 @@ export function LinkEditForm({
     ],
   };
   const [defaultSlug] = useState(generateId());
-
-  useEffect(() => {
-    get('/config')
-      .then(setConfig)
-      .catch(() => {});
-  }, [get]);
 
   const handleSubmit = async ({ domains = [], ...data }: any) => {
     await mutateAsync(
@@ -86,8 +84,8 @@ export function LinkEditForm({
     );
   };
 
-  const checkUrl = (url: string) => {
-    if (!isValidLinkDestinationUrl(url)) {
+  const checkUrl = (url: string, formValues: any) => {
+    if (!isValidLinkDestinationUrl(url.trim()) || url.trim() === `${hostUrl}/${formValues.slug}`) {
       return t(labels.invalidUrl);
     }
     return true;

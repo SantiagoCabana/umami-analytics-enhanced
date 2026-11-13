@@ -83,6 +83,41 @@ const operation1 = defineOperation({
                     'unlimitedWebsites',
                   ],
                 },
+                {
+                  type: 'object',
+                  properties: {
+                    isOwner: {
+                      type: 'boolean',
+                    },
+                    isPro: {
+                      type: 'boolean',
+                    },
+                    isBusiness: {
+                      type: 'boolean',
+                    },
+                    isNoBilling: {
+                      type: 'boolean',
+                    },
+                    hasSubscription: {
+                      type: 'boolean',
+                    },
+                    unlimitedWebsites: {
+                      type: 'boolean',
+                    },
+                    billingStatus: {
+                      type: 'string',
+                    },
+                  },
+                  required: [
+                    'isOwner',
+                    'isPro',
+                    'isBusiness',
+                    'isNoBilling',
+                    'hasSubscription',
+                    'unlimitedWebsites',
+                    'billingStatus',
+                  ],
+                },
               ],
             },
           },

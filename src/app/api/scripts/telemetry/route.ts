@@ -1,11 +1,8 @@
 import { CURRENT_VERSION, TELEMETRY_PIXEL } from '@/lib/constants';
+import { isTelemetryDisabled } from '@/lib/telemetry-policy';
 
 export async function GET() {
-  if (
-    process.env.NODE_ENV !== 'production' ||
-    process.env.DISABLE_TELEMETRY ||
-    process.env.PRIVATE_MODE
-  ) {
+  if (process.env.NODE_ENV !== 'production' || isTelemetryDisabled() || process.env.PRIVATE_MODE) {
     return new Response('/* telemetry disabled */', {
       headers: {
         'content-type': 'text/javascript',

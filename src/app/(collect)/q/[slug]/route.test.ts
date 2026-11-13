@@ -189,3 +189,30 @@ test('does not redirect a link with no enabled domain', async () => {
   expect(response.status).toBe(404);
   expect(postMock).not.toHaveBeenCalled();
 });
+
+test.each(['foo', 'javascript:alert(1)', variable('missing')])(
+  'rejects invalid resolved destination %s without a click',
+  async url => {
+    findLinkByDefaultDomainMock.mockResolvedValue({ ...link, url });
+
+    const response = await GET(request(), params);
+
+    expect(response.status).toBe(404);
+    expect(postMock).not.toHaveBeenCalled();
+  },
+);
+
+test('validates an initial variable after resolving it and records the click', async () => {
+  findLinkByDefaultDomainMock.mockResolvedValue({
+    ...link,
+    url: `${variable('destination')}/path`,
+  });
+  getLinkVariablesByNamesMock.mockResolvedValue([
+    { name: 'destination', value: 'https://example.com' },
+  ] as any);
+
+  const response = await GET(request(), params);
+
+  expect(response.headers.get('location')).toBe('https://example.com/path');
+  expect(postMock).toHaveBeenCalledTimes(1);
+});

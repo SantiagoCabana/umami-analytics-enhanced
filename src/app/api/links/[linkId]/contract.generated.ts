@@ -562,7 +562,7 @@ const operation3 = defineOperation({
               },
               url: {
                 type: 'string',
-                maxLength: 500,
+                maxLength: 2000,
                 description: 'URL associated with the resource.',
               },
               slug: {

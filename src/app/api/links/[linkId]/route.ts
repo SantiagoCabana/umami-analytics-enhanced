@@ -27,7 +27,12 @@ export async function GET(request: Request, { params }: { params: Promise<{ link
 export async function POST(request: Request, { params }: { params: Promise<{ linkId: string }> }) {
   const schema = z.object({
     name: z.string().max(100).optional(),
-    url: z.string().max(2000).refine(isValidLinkDestinationUrl).optional(),
+    url: z
+      .string()
+      .trim()
+      .max(2000)
+      .refine(isValidLinkDestinationUrl, { message: 'Invalid URL.' })
+      .optional(),
     slug: z.string().refine(isValidLinkSlug).optional(),
     isDefaultDomainEnabled: z.boolean().optional(),
     domains: z.array(z.string()).max(20).optional(),

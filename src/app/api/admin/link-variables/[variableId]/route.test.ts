@@ -34,7 +34,7 @@ beforeEach(() => {
 
 test('POST normalizes a variable name before updating', async () => {
   parseRequestMock.mockResolvedValue({
-    auth: { user: { id: 'admin-1' } },
+    auth: { user: { id: 'admin-1', isAdmin: true } },
     body: { name: 'Token', value: 'next' },
     error: undefined,
   });

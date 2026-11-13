@@ -131,6 +131,7 @@ Opciones disponibles:
 | --- | --- |
 | `TWO_FACTOR_ENCRYPTION_KEY` | Clave hexadecimal de 64 caracteres para habilitar 2FA. Genera otra clave con `openssl rand -hex 32` y consérvala entre despliegues. |
 | `API_URL` | Base de las llamadas API internas de la interfaz; admite una ruta relativa o una URL absoluta. |
+| `ENABLE_UMAMI_TELEMETRY=1` | Opcional: habilita explícitamente la telemetría de instalación y compilación de Umami. En esta fork está deshabilitada por defecto. `DISABLE_TELEMETRY` tiene prioridad. |
 | `MCP_ENABLED=1` | Habilita `/mcp`, desactivado por defecto. Se autentica con una clave API creada en Configuración → API keys. |
 
 ### 3. Compilar e iniciar
@@ -146,6 +147,8 @@ escucha en el puerto `3000`. En una instalación nueva, entra con `admin` / `uma
 Para exponer la aplicación, configura un proxy inverso con HTTPS hacia el puerto `3000`.
 Conserva `Host` y `X-Forwarded-Host` al servir dominios adicionales y rechaza hosts desconocidos
 en el proxy. La validación de dominios requiere direcciones públicas; no acepta redes privadas.
+
+To bind to the `HOSTNAME` and `PORT` set in your `.env` file, start with `pnpm run start:env` instead.
 
 ---
 

@@ -15,14 +15,16 @@ export function LinksPage() {
   const { teamId } = useNavigation();
   const { data: team, isError } = useTeamQuery(teamId);
 
-  const showActions = teamId
-    ? !isError &&
-      team?.id === teamId &&
-      !!team.members?.some(
-        (member: { userId: string; role: string }) =>
-          member.userId === user.id && member.role !== ROLES.teamViewOnly,
-      )
-    : user.role !== ROLES.viewOnly;
+  const showActions =
+    user.role !== ROLES.viewOnly &&
+    (teamId
+      ? !isError &&
+        team?.id === teamId &&
+        !!team.members?.some(
+          (member: { userId: string; role: string }) =>
+            member.userId === user.id && member.role !== ROLES.teamViewOnly,
+        )
+      : true);
 
   return (
     <PageBody>

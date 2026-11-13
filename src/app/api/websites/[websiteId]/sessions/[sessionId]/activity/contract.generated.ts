@@ -36,7 +36,7 @@ const operation1 = defineOperation({
       {
         name: 'startAt',
         in: 'query',
-        required: true,
+        required: false,
         schema: {
           type: 'integer',
         },
@@ -45,7 +45,7 @@ const operation1 = defineOperation({
       {
         name: 'endAt',
         in: 'query',
-        required: true,
+        required: false,
         schema: {
           type: 'integer',
         },
@@ -59,6 +59,32 @@ const operation1 = defineOperation({
           type: 'string',
         },
         description: 'Custom identifier assigned to the visitor.',
+      },
+      {
+        name: 'period',
+        in: 'query',
+        required: false,
+        schema: {
+          type: 'string',
+          enum: [
+            'today',
+            '24h',
+            '7d',
+            '30d',
+            '0day',
+            '24hour',
+            '0week',
+            '7day',
+            '0month',
+            '30day',
+            '90day',
+            '0year',
+            '6month',
+            '12month',
+          ],
+        },
+        description:
+          'Relative date range, for example 7d or 30day, used instead of an explicit startAt/endAt range.',
       },
     ],
     responses: {

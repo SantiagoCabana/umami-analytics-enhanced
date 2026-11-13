@@ -76,6 +76,12 @@ const operation1 = defineOperation({
                   items: {
                     type: 'object',
                     properties: {
+                      distinctIds: {
+                        type: 'array',
+                        items: {
+                          type: 'string',
+                        },
+                      },
                       id: {
                         type: 'string',
                         description: 'Unique identifier of the resource.',
@@ -103,7 +109,15 @@ const operation1 = defineOperation({
                         description: 'ID of the visit.',
                       },
                     },
-                    required: ['id', 'createdAt', 'updatedAt', 'name', 'websiteId', 'visitId'],
+                    required: [
+                      'distinctIds',
+                      'id',
+                      'createdAt',
+                      'updatedAt',
+                      'name',
+                      'websiteId',
+                      'visitId',
+                    ],
                   },
                   description: 'Data returned by the operation.',
                 },

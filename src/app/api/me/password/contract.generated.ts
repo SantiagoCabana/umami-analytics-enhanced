@@ -43,6 +43,9 @@ const operation1 = defineOperation({
             schema: {
               type: 'object',
               properties: {
+                token: {
+                  type: 'string',
+                },
                 id: {
                   type: 'string',
                   description: 'Unique identifier of the resource.',
@@ -61,7 +64,7 @@ const operation1 = defineOperation({
                   description: 'Permission role assigned to the user.',
                 },
               },
-              required: ['id', 'createdAt', 'username', 'role'],
+              required: ['token', 'id', 'createdAt', 'username', 'role'],
             },
           },
         },
@@ -92,6 +95,23 @@ const operation1 = defineOperation({
                 message: 'Unauthorized.',
                 code: 'unauthorized',
                 status: 401,
+              },
+            },
+            schema: {
+              $ref: '#/components/schemas/ApiError',
+            },
+          },
+        },
+      },
+      '404': {
+        description: 'Not found.',
+        content: {
+          'application/json': {
+            example: {
+              error: {
+                message: 'Not found.',
+                code: 'not-found',
+                status: 404,
               },
             },
             schema: {

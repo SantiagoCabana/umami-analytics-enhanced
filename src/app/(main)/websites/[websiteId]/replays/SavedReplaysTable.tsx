@@ -4,9 +4,18 @@ import { DataTable } from '@/components/common/DataTable';
 import { DateDistance } from '@/components/common/DateDistance';
 import { useMessages, useNavigation } from '@/components/hooks';
 
-export function SavedReplaysTable({ ...props }: DataTableProps) {
+import { useEffect } from 'react';
+import { clearReplays, setReplays } from '@/store/replays';
+
+export function SavedReplaysTable({ websiteId, ...props }: DataTableProps & { websiteId: string }) {
   const { t, labels } = useMessages();
   const { router, updateParams } = useNavigation();
+
+  useEffect(() => {
+    setReplays(websiteId, 'saved', props.data || []);
+
+    return () => clearReplays(websiteId, 'saved');
+  }, [websiteId, props.data]);
 
   return (
     <DataTable {...props}>
@@ -23,6 +32,11 @@ export function SavedReplaysTable({ ...props }: DataTableProps) {
         )}
       </DataColumn>
       <DataColumn id="name" label={t(labels.name)} />
+      <DataColumn id="distinctIds" label={t(labels.distinctId)} width="200px">
+        {(row: any) => (
+          <span style={{ overflowWrap: 'anywhere' }}>{row.distinctIds?.join(', ')}</span>
+        )}
+      </DataColumn>
       <DataColumn id="visitId" label={t(labels.replayId)} />
       <DataColumn id="createdAt" label={t(labels.created)} width="160px">
         {(row: any) => <DateDistance date={new Date(row.createdAt)} />}

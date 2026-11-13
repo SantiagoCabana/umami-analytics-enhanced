@@ -29,7 +29,7 @@ const operation1 = defineOperation({
         in: 'query',
         required: false,
         schema: {
-          type: 'number',
+          type: 'integer',
         },
         description: 'Start of the date range as a Unix timestamp in milliseconds.',
       },
@@ -38,7 +38,7 @@ const operation1 = defineOperation({
         in: 'query',
         required: false,
         schema: {
-          type: 'number',
+          type: 'integer',
         },
         description: 'End of the date range as a Unix timestamp in milliseconds.',
       },
@@ -80,6 +80,32 @@ const operation1 = defineOperation({
           minimum: 1,
         },
         description: 'Maximum number of results to include.',
+      },
+      {
+        name: 'period',
+        in: 'query',
+        required: false,
+        schema: {
+          type: 'string',
+          enum: [
+            'today',
+            '24h',
+            '7d',
+            '30d',
+            '0day',
+            '24hour',
+            '0week',
+            '7day',
+            '0month',
+            '30day',
+            '90day',
+            '0year',
+            '6month',
+            '12month',
+          ],
+        },
+        description:
+          'Relative date range, for example 7d or 30day, used instead of an explicit startAt/endAt range.',
       },
     ],
     responses: {

@@ -29,9 +29,11 @@ function mergeMessages(
 }
 
 const selector = (state: { locale: string }) => state.locale;
+const timeFormatSelector = (state: { timeFormat: string }) => state.timeFormat;
 
 export function useLocale() {
   const locale = useApp(selector);
+  const timeFormat = useApp(timeFormatSelector);
   const forceUpdate = useForceUpdate();
   const dir = getTextDirection(locale);
   const dateLocale = getDateLocale(locale);
@@ -76,5 +78,5 @@ export function useLocale() {
     }
   }, []);
 
-  return { locale, saveLocale, messages, dir, dateLocale };
+  return { locale, saveLocale, messages, dir, dateLocale, timeFormat };
 }

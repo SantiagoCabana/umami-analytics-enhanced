@@ -1,6 +1,7 @@
 import { Alert, AlertTitle, Button, Column, Row } from '@umami/react-zen';
 import { usePathname } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useMessages } from '@/components/hooks';
 import { REPO_URL, VERSION_CHECK } from '@/lib/constants';
 import { setItem } from '@/lib/storage';
@@ -42,13 +43,19 @@ export function UpdateNotice({ user, config }) {
     }
   }, [allowUpdate]);
 
-  if (!allowUpdate || !hasUpdate) {
+  if (!allowUpdate || !hasUpdate || typeof document === 'undefined') {
     return null;
   }
 
-  return (
-    <Column justifyContent="center" alignItems="center" position="fixed" top="10px" width="100%">
-      <Row width="600px">
+  return createPortal(
+    <Column
+      alignItems="center"
+      position="fixed"
+      top="10px"
+      width="100%"
+      style={{ left: 0, zIndex: 'var(--zen-layer-toast, 10001)', pointerEvents: 'none' }}
+    >
+      <Row style={{ width: 'min(600px, calc(100% - 32px))', pointerEvents: 'auto' }}>
         <Alert style={{ width: '100%' }}>
           <AlertTitle>{t(messages.newVersionAvailable, { version: `v${latest}` })}</AlertTitle>
           <Row gap="3" paddingTop="2">
@@ -59,6 +66,7 @@ export function UpdateNotice({ user, config }) {
           </Row>
         </Alert>
       </Row>
-    </Column>
+    </Column>,
+    document.body,
   );
 }

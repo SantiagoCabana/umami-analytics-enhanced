@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { uuid } from '@/lib/crypto';
+import { isEntityIdInUse } from '@/lib/entity';
 import { isValidLinkSlug, normalizeAssignedLinkDomains } from '@/lib/link-domains';
 import { isValidLinkDestinationUrl } from '@/lib/link-variables';
 import { getQueryFilters, parseRequest } from '@/lib/request';
@@ -31,7 +32,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   const schema = z.object({
     name: z.string().max(100),
-    url: z.string().max(2000).refine(isValidLinkDestinationUrl),
+    url: z.string().trim().max(2000).refine(isValidLinkDestinationUrl, { message: 'Invalid URL.' }),
     slug: z.string().refine(isValidLinkSlug),
     isDefaultDomainEnabled: z.boolean().optional(),
     domains: z.array(z.string()).max(20).optional(),
@@ -53,8 +54,17 @@ export async function POST(request: Request) {
     return badRequest({ message: 'One or more selected domains are not available.' });
   }
 
-  if ((teamId && !(await canCreateTeamWebsite(auth, teamId))) || !(await canCreateWebsite(auth))) {
+  const canCreate = teamId
+    ? await canCreateTeamWebsite(auth, teamId)
+    : await canCreateWebsite(auth);
+
+  if (!canCreate) {
     return unauthorized();
+  }
+
+  // Ids share one namespace with every entity and user; see isEntityIdInUse.
+  if (id && (await isEntityIdInUse(id))) {
+    return badRequest({ message: 'ID already in use.' });
   }
 
   const data: any = {

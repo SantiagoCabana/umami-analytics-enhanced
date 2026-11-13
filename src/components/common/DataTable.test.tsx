@@ -6,7 +6,7 @@ import { DataTable } from './DataTable';
 test('reserves pager margins as well as its height', () => {
   const rect = vi
     .spyOn(HTMLElement.prototype, 'getBoundingClientRect')
-    .mockImplementation(function () {
+    .mockImplementation(function (this: HTMLElement) {
       const pager = this.getAttribute('data-pager') === 'true';
       return {
         top: pager ? 500 : 100,

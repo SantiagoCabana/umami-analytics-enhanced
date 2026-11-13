@@ -3,12 +3,13 @@ export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import { POST } from '@/app/api/send/route';
 import { getLinkDomainVerificationHostname } from '@/lib/link-domain-verification';
-import { getBaseDomain, getLinkCacheKey, getRequestLinkDomain } from '@/lib/link-domains';
 import {
-  getLinkVariableNames,
-  isValidLinkDestinationUrl,
-  resolveLinkVariables,
-} from '@/lib/link-variables';
+  getBaseDomain,
+  getLinkCacheKey,
+  getRequestLinkDomain,
+  isValidLinkUrl,
+} from '@/lib/link-domains';
+import { getLinkVariableNames, resolveLinkVariables } from '@/lib/link-variables';
 import redis from '@/lib/redis';
 import { notFound } from '@/lib/response';
 import {
@@ -62,6 +63,17 @@ export async function GET(request: Request, { params }: { params: Promise<{ slug
     return notFound();
   }
 
+  const variables = await getLinkVariablesByNames(getLinkVariableNames(link.url));
+  const destination = resolveLinkVariables(
+    link.url,
+    Object.fromEntries(variables.map(variable => [variable.name, variable.value])),
+  );
+
+  // Validate the resolved destination before recording a click or redirecting.
+  if (!isValidLinkUrl(destination)) {
+    return notFound();
+  }
+
   const payload = {
     type: 'event',
     payload: {
@@ -79,11 +91,5 @@ export async function GET(request: Request, { params }: { params: Promise<{ slug
 
   await POST(req);
 
-  const variables = await getLinkVariablesByNames(getLinkVariableNames(link.url));
-  const destination = resolveLinkVariables(
-    link.url,
-    Object.fromEntries(variables.map(variable => [variable.name, variable.value])),
-  );
-
-  return isValidLinkDestinationUrl(destination) ? NextResponse.redirect(destination) : notFound();
+  return NextResponse.redirect(destination);
 }

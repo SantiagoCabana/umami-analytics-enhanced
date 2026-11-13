@@ -2,6 +2,7 @@ import { isRelationalOnly } from '@/lib/db';
 import { getBaseDomain } from '@/lib/link-domains';
 import { parseRequest } from '@/lib/request';
 import { json, serverError } from '@/lib/response';
+import { isTelemetryDisabled } from '@/lib/telemetry-policy';
 import { getShortDomainHostnames } from '@/queries/prisma';
 
 export const dynamic = 'force-dynamic';
@@ -29,7 +30,7 @@ export async function GET(request: Request) {
     pixelsUrl: process.env.PIXELS_URL,
     privateMode: !!process.env.PRIVATE_MODE,
     sessionDeletionEnabled: isRelationalOnly(),
-    telemetryDisabled: !!process.env.DISABLE_TELEMETRY,
+    telemetryDisabled: isTelemetryDisabled(),
     trackerScriptName: process.env.TRACKER_SCRIPT_NAME,
     updatesDisabled: !!process.env.DISABLE_UPDATES,
   });

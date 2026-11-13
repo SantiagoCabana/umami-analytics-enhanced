@@ -54,6 +54,7 @@ jobs:
         run: pnpm db:migrate
       - name: Verify migrations are repeatable
         run: pnpm db:migrate
+      - run: pnpm lint:i18n
       - run: pnpm openapi:generate
       - run: pnpm openapi:check --explicit
       - run: pnpm check:api:client

@@ -6,13 +6,11 @@ import { defineOperation } from '@/openapi/operation';
 const operation1 = defineOperation({
   method: 'get',
   path: '/api/config',
-  audience: 'internal',
+  audience: 'public',
   auth: 'none',
   operation: {
     operationId: 'getConfig',
-    summary: 'Get application configuration',
-    description:
-      'Returns public application settings, including deployment mode, feature availability, and tracker and resource URLs.',
+    summary: 'Get config',
     tags: ['Configuration'],
     responses: {
       '200': {

@@ -26,11 +26,7 @@ export function BreakdownPage({ websiteId }: { websiteId: string }) {
         websiteId={websiteId}
         extraActions={<FieldsButton value={fields} onChange={setFields} />}
       />
-      <Panel
-        overflow="auto"
-        allowFullscreen
-        toolbar={<DownloadButton filename="breakdown" data={data} />}
-      >
+      <Panel allowFullscreen toolbar={<DownloadButton filename="breakdown" data={data} />}>
         <Breakdown
           key={`${websiteId}:${startDate.getTime()}:${endDate.getTime()}:${fields.join(',')}`}
           websiteId={websiteId}

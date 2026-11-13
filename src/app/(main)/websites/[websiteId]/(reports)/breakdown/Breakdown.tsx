@@ -34,11 +34,7 @@ export function Breakdown({ websiteId, selectedFields = [], startDate, endDate }
   return (
     <LoadingPanel data={data} isLoading={isLoading} error={error}>
       <Column gap="3" minWidth="0">
-        <DataTable
-          scrollMode="page"
-          data={visibleRows}
-          style={{ minWidth: selectedFields.length * 240 + 620 }}
-        >
+        <DataTable data={visibleRows} style={{ minWidth: selectedFields.length * 240 + 620 }}>
           {selectedFields.map(field => {
             return (
               <DataColumn

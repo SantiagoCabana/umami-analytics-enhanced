@@ -67,7 +67,7 @@ export function Retention({ websiteId, days = DAYS, startDate, endDate }: Retent
       {data && (
         <Panel allowFullscreen overflow="auto">
           <Column paddingY="6" paddingX={{ base: '3', md: '6' }} minWidth="0">
-            <Column gap="1" style={{ overflowX: 'auto' }}>
+            <Column gap="1" overflow="auto" maxHeight="50dvh" tabIndex={0}>
               <Grid
                 columns="120px repeat(10, 100px)"
                 alignItems="center"

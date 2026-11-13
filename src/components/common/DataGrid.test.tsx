@@ -91,3 +91,25 @@ test('keeps an empty result inside the measured content area', () => {
   expect(region.style.height).not.toBe('');
   expect(region).toHaveTextContent('No data available');
 });
+
+test('reserves the table area while loading without data', () => {
+  render(<DataGrid query={{ isLoading: true, isFetching: true } as any}>{null}</DataGrid>);
+  const region = screen.getByRole('region', { name: 'Table' });
+  expect(region.style.height).not.toBe('');
+  expect(screen.getAllByRole('status').length).toBeGreaterThan(0);
+});
+
+test('keeps current data while refreshing but hides placeholder data', () => {
+  const data = { data: [{ id: 'one' }], count: 1, page: 1, pageSize: 20 };
+  const grid = (isPlaceholderData: boolean) => (
+    <DataGrid query={{ data, isLoading: false, isFetching: true, isPlaceholderData } as any}>
+      {'Current result'}
+    </DataGrid>
+  );
+  const { rerender } = render(grid(false));
+  expect(screen.getByText('Current result')).toBeInTheDocument();
+  expect(screen.getAllByRole('status').length).toBeGreaterThan(0);
+  rerender(grid(true));
+  expect(screen.queryByText('Current result')).not.toBeInTheDocument();
+  expect(screen.getByRole('region', { name: 'Table' }).style.height).not.toBe('');
+});

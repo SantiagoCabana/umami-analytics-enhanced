@@ -3,6 +3,7 @@ import {
   Button,
   Column,
   Icon,
+  Loading,
   Row,
   SearchField,
   Text,
@@ -57,7 +58,9 @@ export function DataGrid({
   children,
 }: DataGridProps) {
   const { t, labels } = useMessages();
-  const { data, error, isLoading, isFetching } = query;
+  const { data, error, isLoading, isFetching, isPlaceholderData } = query;
+  const showInitialLoading = isLoading || (isFetching && (!data || isPlaceholderData));
+  const showRefresh = isFetching && !!data && !isPlaceholderData && !isLoading;
   const { router, updateParams, query: queryParams } = useNavigation();
   const [search, setSearch] = useState(queryParams?.search || data?.search || '');
   const pushedSearch = useRef<string | null>(null);
@@ -160,36 +163,45 @@ export function DataGrid({
           {!isMobile && viewToggleButton}
         </Row>
       </Row>
-      <LoadingPanel
-        data={data?.data}
-        isLoading={isLoading}
-        isFetching={isFetching}
-        error={error}
-        renderEmpty={() => (
-          <TableViewport>
-            <Column height="100%" width="100%" alignItems="center" justifyContent="center">
-              {renderEmpty()}
-            </Column>
-          </TableViewport>
-        )}
-      >
-        {data && (
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'minmax(0, 1fr)',
-              minWidth: 0,
-            }}
-          >
-            <Column>
-              {isValidElement(child)
-                ? cloneElement(child as ReactElement<any>, { displayMode })
-                : child}
-            </Column>
-          </div>
-        )}
-      </LoadingPanel>
-      {showPager && (
+      {showRefresh && <Loading placement="inline" />}
+      {showInitialLoading ? (
+        <TableViewport>
+          <Column height="100%" width="100%" alignItems="center" justifyContent="center">
+            <Loading placement="inline" />
+          </Column>
+        </TableViewport>
+      ) : (
+        <LoadingPanel
+          data={data?.data}
+          isLoading={false}
+          isFetching={false}
+          error={error}
+          renderEmpty={() => (
+            <TableViewport>
+              <Column height="100%" width="100%" alignItems="center" justifyContent="center">
+                {renderEmpty()}
+              </Column>
+            </TableViewport>
+          )}
+        >
+          {data && (
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'minmax(0, 1fr)',
+                minWidth: 0,
+              }}
+            >
+              <Column>
+                {isValidElement(child)
+                  ? cloneElement(child as ReactElement<any>, { displayMode })
+                  : child}
+              </Column>
+            </div>
+          )}
+        </LoadingPanel>
+      )}
+      {showPager && !showInitialLoading && (
         <Row marginTop="4">
           <Pager
             page={data.page}

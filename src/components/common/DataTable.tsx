@@ -6,13 +6,21 @@ import { useMessages } from '@/components/hooks';
 import styles from './DataTable.module.css';
 
 /** One scroll owner per table, including standalone reports and dialogs. */
-export function DataTable(props: DataTableProps) {
+export function DataTable({
+  scrollMode = 'viewport',
+  ...props
+}: DataTableProps & { scrollMode?: 'viewport' | 'page' }) {
   const ref = useRef<HTMLDivElement>(null);
   const { t, labels } = useMessages();
 
   useLayoutEffect(() => {
     const element = ref.current;
     if (!element) return;
+    if (scrollMode === 'page') {
+      element.style.height = '';
+      element.style.maxHeight = '';
+      return;
+    }
     let frame = 0;
     const measure = () => {
       const viewportHeight = window.visualViewport?.height || window.innerHeight;
@@ -88,12 +96,12 @@ export function DataTable(props: DataTableProps) {
       window.removeEventListener('resize', schedule);
       window.visualViewport?.removeEventListener('resize', schedule);
     };
-  }, [props.displayMode]);
+  }, [props.displayMode, scrollMode]);
 
   return (
     <div
       ref={ref}
-      className={styles.viewport}
+      className={scrollMode === 'page' ? styles.page : styles.viewport}
       role="region"
       aria-label={t(labels.table)}
       tabIndex={0}

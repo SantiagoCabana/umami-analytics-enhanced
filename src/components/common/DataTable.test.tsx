@@ -75,3 +75,17 @@ test('preserves the card display mode', () => {
   expect(screen.queryByRole('table')).not.toBeInTheDocument();
   expect(screen.getByText('Campaign')).toBeInTheDocument();
 });
+
+test('page scroll mode removes viewport sizing when switched', () => {
+  const table = (scrollMode: 'page' | 'viewport') => (
+    <DataTable scrollMode={scrollMode} data={[{ id: 'one', name: 'Campaign' }]}>
+      <DataColumn id="name" label="Name" />
+    </DataTable>
+  );
+  const { rerender } = render(table('viewport'));
+  const region = screen.getByRole('region', { name: 'Table' });
+  expect(region.style.height).not.toBe('');
+  rerender(table('page'));
+  expect(region.style.height).toBe('');
+  expect(region.style.maxHeight).toBe('');
+});

@@ -27,7 +27,6 @@ export function BreakdownPage({ websiteId }: { websiteId: string }) {
         extraActions={<FieldsButton value={fields} onChange={setFields} />}
       />
       <Panel
-        height="900px"
         overflow="auto"
         allowFullscreen
         toolbar={<DownloadButton filename="breakdown" data={data} />}

@@ -65,17 +65,9 @@ export function Retention({ websiteId, days = DAYS, startDate, endDate }: Retent
   return (
     <LoadingPanel data={data} isLoading={isLoading} error={error}>
       {data && (
-        <Panel allowFullscreen height="900px">
-          <Column
-            paddingY="6"
-            paddingX={{ base: '3', md: '6' }}
-            position="absolute"
-            top="40px"
-            left="0"
-            right="0"
-            bottom="0"
-          >
-            <Column gap="1" overflow="auto">
+        <Panel allowFullscreen overflow="auto">
+          <Column paddingY="6" paddingX={{ base: '3', md: '6' }} minWidth="0">
+            <Column gap="1" style={{ overflowX: 'auto' }}>
               <Grid
                 columns="120px repeat(10, 100px)"
                 alignItems="center"
